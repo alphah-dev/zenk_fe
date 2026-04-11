@@ -1107,33 +1107,6 @@
   text-transform: uppercase;
 }
 
-.sc-perspective-toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 12px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.04);
-  color: var(--sc-text-muted);
-  text-decoration: none;
-  font-size: 11px;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.sc-perspective-toggle:hover {
-  background: white;
-  color: var(--sc-green);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  transform: translateY(-1px);
-}
-
-.sc-perspective-toggle svg {
-  flex-shrink: 0;
-}
-
 .sc-live-pulse {
   width: 6px;
   height: 6px;

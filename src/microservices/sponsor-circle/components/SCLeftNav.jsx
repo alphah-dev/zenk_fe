@@ -9,7 +9,6 @@ import {
   CurrencyDollarIcon,
   UsersIcon,
   AcademicCapIcon,
-  ArrowsRightLeftIcon,
 } from '@heroicons/react/24/outline'
 
 const MEMBER_NAV = [
@@ -48,16 +47,6 @@ export default function SCLeftNav({ activeTab, setActiveTab, isLeader = false })
         <span className="sc-role-badge" style={isLeader ? { background: '#f59e0b', color: '#0f172a' } : {}}>
           {isLeader ? 'Circle Coordinator' : 'Sponsor Circle'}
         </span>
-        
-        {/* Perspective Switcher */}
-        <Link 
-          to={isLeader ? "/sponsor-circle" : "/sponsor-leader"} 
-          className="sc-perspective-toggle"
-          title={isLeader ? "Switch to Sponsor View" : "Switch to Coordinator View"}
-        >
-          <ArrowsRightLeftIcon className="w-4 h-4" />
-          <span>{isLeader ? "Switch to Sponsor View" : "Switch to Leader View"}</span>
-        </Link>
       </div>
 
       <div 
