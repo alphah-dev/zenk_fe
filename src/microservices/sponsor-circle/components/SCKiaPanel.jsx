@@ -100,7 +100,7 @@ function ChatContentWrapper({ userRole }) {
         <div style={{ padding: '8px 12px', background: '#fee2e2', color: '#991b1b', fontSize: '11px', borderBottom: '1px solid #fca5a5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span><strong>Connection Error:</strong> {wsError.reason || wsError.code}</span>
           {wsError.code === 'auth_failed' && (
-            <Link to="/login" style={{ background: '#991b1b', color: 'white', padding: '2px 6px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold', fontSize: '10px' }}>
+            <Link to="/chat-demo" style={{ background: '#991b1b', color: 'white', padding: '2px 6px', borderRadius: '4px', textDecoration: 'none', fontWeight: 'bold', fontSize: '10px' }}>
               Login
             </Link>
           )}
