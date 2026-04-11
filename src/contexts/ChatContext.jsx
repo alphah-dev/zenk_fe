@@ -11,8 +11,8 @@ export const useChat = () => {
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
-export const ChatProvider = ({ circleId, children }) => {
-  const chat = useCircleChat(circleId)
+export const ChatProvider = ({ circleId, userRole = 'sponsor', children }) => {
+  const chat = useCircleChat(circleId, userRole)
 
   const [channels, setChannels] = useState([])
   const [activeChannel, setActiveChannel] = useState(null)
@@ -30,7 +30,7 @@ export const ChatProvider = ({ circleId, children }) => {
       if (!res.ok) throw new Error(`Channels fetch failed: ${res.status}`)
       const data = await res.json()
       setChannels(data)
-      if (data.length > 0 && !activeChannel) {
+      if (data && data.length > 0 && !activeChannel) {
         setActiveChannel(data[0])
       }
     } catch (err) {
