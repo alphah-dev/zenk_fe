@@ -2066,3 +2066,84 @@
 .sc-share-title { font-size: 14px; color: var(--sc-text); }
 .sc-share-percent { font-size: 14px; font-weight: 700; }
 
+
+
+/* --- Mobile Responsive --- */
+@media (max-width: 768px) {
+  .sc-root {
+    flex-direction: column;
+  }
+  .sc-left-nav {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: -280px;
+    width: 250px;
+    z-index: 1000;
+    transition: left 0.3s ease;
+    box-shadow: var(--sc-shadow-md);
+  }
+  .sc-left-nav.open {
+    left: 0;
+  }
+  .sc-mobile-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+  }
+  .sc-mobile-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: var(--sc-white);
+    border-bottom: 1px solid var(--sc-border);
+  }
+  .sc-main {
+    flex: 1;
+  }
+  .sc-tabs {
+    overflow-x: auto;
+    padding-bottom: 12px;
+  }
+  .sc-metrics-row {
+    grid-template-columns: 1fr;
+  }
+  .sc-half-grid, .sc-student-grid, .sc-time-boxes {
+    grid-template-columns: 1fr;
+  }
+  .sc-budget-boxes {
+    grid-template-columns: 1fr;
+  }
+  .sc-summary-grid {
+    grid-template-columns: 1fr;
+  }
+  .sc-profile-header-banner {
+    flex-direction: column;
+    text-align: center;
+  }
+  .sc-right-panel {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: 400px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 900;
+    border-left: none;
+    border-top: 1px solid var(--sc-border);
+    transition: height 0.3s ease;
+  }
+  .sc-right-panel.size-compact { height: 60px; overflow: hidden; }
+  .sc-right-panel.size-half { height: 50vh; }
+  .sc-right-panel.size-full { height: 100vh; z-index: 1100; }
+  .sc-resizer-handle { display: none !important; }
+  .sc-mobile-size-toggles { display: flex !important; }
+}
+.sc-mobile-header { display: none; }
+.sc-mobile-size-toggles { display: none; gap: 4px; }
+
+.sc-mobile-close { display: none; }
+@media (max-width: 768px) { .sc-mobile-close { display: block; position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--sc-text); cursor: pointer; padding: 4px; } }

@@ -148,6 +148,7 @@ export default function SCKiaPanel() {
   const [circleId, setCircleId] = useState('481eba8f-778d-4618-8f9e-6e6b263d89a0')
   const [activeCircleId, setActiveCircleId] = useState('481eba8f-778d-4618-8f9e-6e6b263d89a0')
   const [inputVal, setInputVal] = useState('')
+  const [panelSize, setPanelSize] = useState('half') // 'compact', 'half', 'full'
 
   // Persist panel width in localStorage
   const [panelWidth, setPanelWidth] = useState(() => {
@@ -191,16 +192,25 @@ export default function SCKiaPanel() {
   }
 
   return (
-    <div className="sc-right-panel" style={{ width: panelWidth, minWidth: panelWidth, position: 'relative' }}>
+    <div className={`sc-right-panel mobile-size-${panelSize}`} style={window.innerWidth > 768 ? { width: panelWidth, minWidth: panelWidth, position: 'relative' } : {}}>
       {/* Resizer Handle */}
       <div 
+        className="sc-resizer-handle"
         style={{ position: 'absolute', left: -2, top: 0, bottom: 0, width: '6px', cursor: 'ew-resize', zIndex: 100 }}
         onMouseDown={handleMouseDown}
       />
       <div className="sc-panel-header">
         <span className="sc-panel-dot" />
         <span className="sc-panel-title">Chat &amp; Kia</span>
-        <SparklesIcon style={{ marginLeft: 'auto', width: 18, height: 18, color: '#f08c3b' }} />
+        
+        {/* Mobile Size Toggles */}
+        <div className="sc-mobile-size-toggles" style={{ marginLeft: 'auto', display: 'none', alignItems: 'center', gap: '4px' }}>
+          <button onClick={() => setPanelSize('compact')} style={{ padding: '2px 6px', fontSize: 10, borderRadius: 4, background: panelSize === 'compact' ? '#1e8e6a' : '#f4f3eb', color: panelSize === 'compact' ? 'white' : '#6b7280', border: 'none' }}>Compact</button>
+          <button onClick={() => setPanelSize('half')} style={{ padding: '2px 6px', fontSize: 10, borderRadius: 4, background: panelSize === 'half' ? '#1e8e6a' : '#f4f3eb', color: panelSize === 'half' ? 'white' : '#6b7280', border: 'none' }}>Half</button>
+          <button onClick={() => setPanelSize('full')} style={{ padding: '2px 6px', fontSize: 10, borderRadius: 4, background: panelSize === 'full' ? '#1e8e6a' : '#f4f3eb', color: panelSize === 'full' ? 'white' : '#6b7280', border: 'none' }}>Full</button>
+        </div>
+
+        <SparklesIcon style={{ marginLeft: window.innerWidth > 768 ? 'auto' : 0, width: 18, height: 18, color: '#f08c3b' }} />
       </div>
 
       <div className="sc-kia-header">

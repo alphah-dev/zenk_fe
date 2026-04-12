@@ -9,6 +9,7 @@ import {
   CurrencyDollarIcon,
   UsersIcon,
   AcademicCapIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline'
 
 const MEMBER_NAV = [
@@ -30,7 +31,7 @@ const LEADER_NAV = [
   { label: 'Settings', tab: 'Settings', icon: Cog8ToothIcon },
 ]
 
-export default function SCLeftNav({ activeTab, setActiveTab, isLeader = false }) {
+export default function SCLeftNav({ activeTab, setActiveTab, isLeader = false, isOpen = false, onClose }) {
   const location = useLocation()
   const NAV_ITEMS = isLeader ? LEADER_NAV : MEMBER_NAV
   const profile = isLeader ? LEADER_PROFILE : USER_PROFILE
@@ -38,7 +39,10 @@ export default function SCLeftNav({ activeTab, setActiveTab, isLeader = false })
   const profileTab = 'My Profile'
 
   return (
-    <nav className="sc-left-nav">
+    <nav className={`sc-left-nav ${isOpen ? 'open' : ''}`}>
+      <button className="sc-mobile-close" onClick={onClose}>
+        <XMarkIcon className="w-6 h-6" />
+      </button>
       <div className="sc-logo">
         <div className="sc-logo-text">
           <span className="sc-logo-zen">ZEN</span>

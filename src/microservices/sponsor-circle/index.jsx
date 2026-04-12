@@ -1,5 +1,5 @@
 import './sponsor-circle.css'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import SCLeftNav from './components/SCLeftNav'
 import SCMetricCards from './components/SCMetricCards'
 import SCBudgetTracker from './components/SCBudgetTracker'
@@ -14,15 +14,34 @@ import SCChatMainView from './components/SCChatMainView'
 import SCSponsorProfile from './components/SCSponsorProfile'
 import SCImpactLeague from './components/SCImpactLeague'
 import SCSettings from './components/SCSettings'
+import { Bars3Icon } from '@heroicons/react/24/outline'
 
 const TABS = ['My Profile', 'My Circle', 'Impact League', 'Statement', 'Chat & Kia']
 
 export default function SponsorCircleDashboard() {
   const [activeTab, setActiveTab] = useState('My Profile')
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  // Close menu when tab changes on mobile
+  useEffect(() => {
+    setIsMenuOpen(false)
+  }, [activeTab])
 
   return (
-    <div className="sc-root">
-      <SCLeftNav activeTab={activeTab} setActiveTab={setActiveTab} />
+    <div className="sc-root relative">
+      <div className="sc-mobile-header">
+        <div className="sc-logo-text" style={{ fontSize: '18px' }}>
+          <span className="sc-logo-zen">ZEN</span>
+          <span className="sc-logo-k">K</span>
+        </div>
+        <button onClick={() => setIsMenuOpen(true)} className="p-2 text-gray-600 bg-gray-100 rounded-md">
+          <Bars3Icon className="w-6 h-6" />
+        </button>
+      </div>
+
+      {isMenuOpen && <div className="sc-mobile-overlay" onClick={() => setIsMenuOpen(false)}></div>}
+
+      <SCLeftNav activeTab={activeTab} setActiveTab={setActiveTab} isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
 
       <main className={`sc-main${activeTab === 'Chat & Kia' ? ' sc-main-chat' : ''}`}>
         <div className="sc-tabs">
