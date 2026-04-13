@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import axios from 'axios'
-import { ShieldExclamationIcon, TrashIcon, UserMinusIcon, ExclamationTriangleIcon, CheckCircleIcon, ClipboardDocumentListIcon, Squares2X2Icon } from '@heroicons/react/24/outline'
+import { ShieldExclamationIcon, TrashIcon, UserMinusIcon, ExclamationTriangleIcon, CheckCircleIcon, ClipboardDocumentListIcon, Squares2X2Icon, ShieldCheckIcon } from '@heroicons/react/24/outline'
 import Layout from '../../components/Layout'
 import PersonaAvatar from '../../components/chat/PersonaAvatar'
 
@@ -11,6 +11,7 @@ const TABS = [
   { key: 'reports', label: 'Reports', icon: ExclamationTriangleIcon },
   { key: 'ai', label: 'System Flagged', icon: ShieldExclamationIcon },
   { key: 'ban', label: 'Issue Ban', icon: UserMinusIcon },
+  { key: 'auth', label: 'Auth Logs', icon: ShieldCheckIcon },
   { key: 'history', label: 'Ban History', icon: TrashIcon },
   { key: 'audit', label: 'Audit Trail', icon: ClipboardDocumentListIcon },
 ]
@@ -43,6 +44,7 @@ export default function ChatBans() {
   const [activity, setActivity] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [authLogs, setAuthLogs] = useState([])
 
   const [circleId, setCircleId] = useState('')
   const [userId, setUserId] = useState('')
@@ -75,11 +77,16 @@ export default function ChatBans() {
     catch (err) { console.error('Failed to load warned messages', err) }
   }, [token])
 
+  const fetchAuthLogs = useCallback(async () => {
+    try { const res = await axios.get(`${API_BASE}/admin/audit/auth-logs`, { headers: { Authorization: `Bearer ${token}` } }); setAuthLogs(res.data) }
+    catch (err) { console.error('Failed to load auth logs', err) }
+  }, [token])
+
   const fetchData = useCallback(async () => {
     setLoading(true)
-    await Promise.all([fetchBans(), fetchReports(), fetchActivity(), fetchWarned()])
+    await Promise.all([fetchBans(), fetchReports(), fetchActivity(), fetchWarned(), fetchAuthLogs()])
     setLoading(false)
-  }, [fetchBans, fetchReports, fetchActivity, fetchWarned])
+  }, [fetchBans, fetchReports, fetchActivity, fetchWarned, fetchAuthLogs])
 
   useEffect(() => { if (token) fetchData(); else setLoading(false) }, [token, fetchData])
 
@@ -136,7 +143,7 @@ export default function ChatBans() {
   )
 
   /* ── Tab badge counts ────────────────────────────────────────────────── */
-  const badges = { reports: reports.length, ai: warned.length, ban: null, history: bans.length, audit: activity.length }
+  const badges = { reports: reports.length, ai: warned.length, ban: null, auth: authLogs.filter(l => l.status !== 'SUCCESS').length, history: bans.length, audit: activity.length }
 
   return (
     <Layout>
@@ -334,6 +341,68 @@ export default function ChatBans() {
                   </form>
                   {submitError && <p className="mt-4 text-red-400 text-sm font-semibold">{submitError}</p>}
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── AUTH LOGS ─────────────────────────────────────────────── */}
+          {(activeTab === 'auth' || activeTab === 'all') && (
+            <div style={{ borderBottom: activeTab === 'all' ? '12px solid #f8f9fa' : 'none' }}>
+              {activeTab === 'all' && (
+                <div style={{ padding: '24px 24px 12px', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '16px', fontWeight: 700, color: '#0f766e' }}>
+                    <ShieldCheckIcon style={{ width: 18, height: 18, color: '#0d9488' }} />
+                    Authentication Integrity Trail
+                </div>
+              )}
+              <div className="p-6">
+                {authLogs.length === 0 ? (
+                  <div className="text-center py-16 text-gray-400 italic">No authentication logs recorded yet.</div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-gray-100 uppercase tracking-widest text-[10px] text-gray-400 font-bold">
+                          <th className="pb-3 px-2">Timestamp</th>
+                          <th className="pb-3 px-2">Account (Email)</th>
+                          <th className="pb-3 px-2">Status</th>
+                          <th className="pb-3 px-2">Diagnostic Comment</th>
+                          <th className="pb-3 px-2">Metadata</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {authLogs.map(log => {
+                            const isFail = log.status !== 'SUCCESS';
+                            return (
+                                <tr key={log.id} className="hover:bg-gray-50/50 transition-colors">
+                                    <td className="py-4 px-2 text-xs text-gray-500 whitespace-nowrap">
+                                        <div className="font-bold text-gray-700">{new Date(log.timestamp).toLocaleDateString()}</div>
+                                        <div>{new Date(log.timestamp).toLocaleTimeString()}</div>
+                                    </td>
+                                    <td className="py-4 px-2">
+                                        <span className="text-sm font-semibold text-teal-700 underline underline-offset-4 decoration-teal-100">{log.email}</span>
+                                    </td>
+                                    <td className="py-4 px-2">
+                                        <span className={`text-[10px] font-bold px-2 py-1 rounded-full border ${
+                                            log.status === 'SUCCESS' ? 'bg-green-50 text-green-700 border-green-100' : 
+                                            log.status === 'FAIL_KYC' ? 'bg-orange-50 text-orange-700 border-orange-100' :
+                                            'bg-red-50 text-red-700 border-red-100'
+                                        }`}>
+                                            {log.status}
+                                        </span>
+                                    </td>
+                                    <td className="py-4 px-2">
+                                        <p className={`text-xs ${isFail ? 'font-bold text-gray-800' : 'text-gray-500'}`}>{log.comment}</p>
+                                    </td>
+                                    <td className="py-4 px-2">
+                                        <p className="text-[10px] text-gray-400 font-mono" title={log.user_agent}>{log.ip_address || '0.0.0.0'}</p>
+                                    </td>
+                                </tr>
+                            )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             </div>
           )}
