@@ -78,7 +78,7 @@ export default function ChatBans() {
   }, [token])
 
   const fetchAuthLogs = useCallback(async () => {
-    try { const res = await axios.get(`${API_BASE}/admin/audit/auth-logs`, { headers: { Authorization: `Bearer ${token}` } }); setAuthLogs(res.data) }
+    try { const res = await axios.get(`${API_BASE}/admin/chat/auth-logs`, { headers: { Authorization: `Bearer ${token}` } }); setAuthLogs(res.data) }
     catch (err) { console.error('Failed to load auth logs', err) }
   }, [token])
 
