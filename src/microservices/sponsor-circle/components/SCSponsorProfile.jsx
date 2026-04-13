@@ -81,7 +81,7 @@ export default function SCSponsorProfile({ isLeader = false }) {
 
       // 1. PRIMARY: GNEWS (Country: IN) - Strictly Curated
       const gnewsQuery = encodeURIComponent('("education" OR "literacy" OR "donation" OR "scholarship") AND ("India" OR "NGO")')
-      const gnewsUrl = `https://gnews.io/api/v4/search?q=${gnewsQuery}&country=in&lang=en&apikey=${gnewsKey}`
+      const gnewsUrl = 'https://corsproxy.io/?' + encodeURIComponent(`https://gnews.io/api/v4/search?q=${gnewsQuery}&country=in&lang=en&apikey=${gnewsKey}`)
 
       const newsRes = await fetch(gnewsUrl)
       const newsData = await newsRes.json()
