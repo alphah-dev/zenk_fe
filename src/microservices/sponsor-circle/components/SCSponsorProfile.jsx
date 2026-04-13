@@ -76,35 +76,15 @@ export default function SCSponsorProfile({ isLeader = false }) {
 
   const fetchImpactData = async () => {
     try {
-      const gnewsKey = 'e3d9cf8ba124ee84dc994f9047b3cb80'
-      const newsApiKey = '869deb62e3ad4e98b3305acd694f49b2'
-
-      // 1. PRIMARY: GNEWS (Country: IN) - Strictly Curated
-      const gnewsQuery = encodeURIComponent('("education" OR "literacy" OR "donation" OR "scholarship") AND ("India" OR "NGO")')
-      const gnewsUrl = 'https://corsproxy.io/?' + encodeURIComponent(`https://gnews.io/api/v4/search?q=${gnewsQuery}&country=in&lang=en&apikey=${gnewsKey}`)
-
-      const newsRes = await fetch(gnewsUrl)
-      const newsData = await newsRes.json()
-
-      let items = []
-      if (newsData.articles) {
-        items = newsData.articles.map(curateAndCategorize).filter(Boolean)
-      }
-
-      // 2. FALLBACK: NewsAPI (Strict Query for Indian NGOs)
-      if (items.length < 3) {
-        const fallbackQuery = encodeURIComponent('("education India" OR "scholarship India" OR "Akshaya Patra" OR "Teach For India")')
-        const fallbackUrl = `https://newsapi.org/v2/everything?q=${fallbackQuery}&language=en&sortBy=publishedAt&pageSize=20&apiKey=${newsApiKey}`
-        const fbRes = await fetch(fallbackUrl)
-        const fbData = await fbRes.json()
-        if (fbData.articles) {
-          const fbItems = fbData.articles.map(curateAndCategorize).filter(Boolean)
-          items = [...items, ...fbItems]
-        }
-      }
-
-      // FALLBACK TO MOCK if world results fail
-      if (items.length === 0) items = GLOBAL_NEWS_MOCK.map(m => ({ ...m, type: 'GLOBAL', category: 'Education Stats', summary: m.text }))
+      // 1. External News APIs (GNews & NewsAPI) actively block free-tier browser requests
+      // from deployed domains like Vercel (yielding 403 Forbidden and 426 Upgrade Required).
+      // For this sandbox, we bypass the failing fetches and use the high-fidelity mock data directly.
+      let items = GLOBAL_NEWS_MOCK.map(m => ({ 
+        ...m, 
+        type: 'GLOBAL', 
+        category: 'Education Stats', 
+        summary: m.text 
+      }))
 
       setGlobalFeed(items)
 
