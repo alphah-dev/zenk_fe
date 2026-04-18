@@ -15,7 +15,6 @@ export default function SCSettings({ isLeader = false }) {
     pushMilestones: true,
     publicAmount: false,
     kiaDetailed: true,
-    kiaDetailed: true,
     autoPayEnabled: true,
     memberOversight: true,
     vendorApprovalRequired: false
