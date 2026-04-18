@@ -62,9 +62,9 @@ export default function MessageList({ userPersona, activeChannelId }) {
     <div 
       ref={listContainerRef} 
       onScroll={handleScroll}
-      className="flex-1 overflow-y-auto flex flex-col min-h-0 relative scroll-smooth"
+      className="flex-1 overflow-y-auto overscroll-contain touch-pan-y flex flex-col min-h-0 relative scroll-smooth"
     >
-      {/* Scroll to Bottom Button */}
+Proxy:      {/* Scroll to Bottom Button */}
       {showScrollDown && (
         <button
           onClick={scrollToBottom}
