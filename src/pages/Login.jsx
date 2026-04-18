@@ -17,8 +17,8 @@ function Login() {
       localStorage.setItem('isAdmin', 'true')
       // Dispatch custom event to notify NotificationContext
       window.dispatchEvent(new Event('adminLogin'))
-      // Navigate to dashboard or home page
-      navigate('/dashboard')
+      // Navigate to home page
+      navigate('/dashboard/home')
     } else {
       alert('Invalid credentials. Use admin/password')
     }
