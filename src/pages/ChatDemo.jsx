@@ -158,8 +158,8 @@ function ChatContent({ userRole, circleId, onDisconnect, onLogout }) {
     const errorMsg = wsError?.reason || 'Failed to connect to the circle chat. Please check your backend and connection settings.'
 
     return (
-      <div className={`flex flex-col items-center justify-center h-[calc(100vh-120px)] ${isBanned ? 'bg-red-50 text-red-700 border-red-200' : 'bg-orange-50 text-orange-700 border-orange-200'} border rounded-xl mx-4 my-6 p-8 text-center shadow-sm`}>
-        <div className={`${isBanned ? 'bg-red-100' : 'bg-orange-100'} p-4 rounded-full mb-4`}>
+      <div className={`flex flex-col items-center justify-center flex-1 min-h-0 ${isBanned ? 'bg-red-50 text-red-700 border-red-200' : 'bg-orange-50 text-orange-700 border-orange-200'} border rounded-xl mx-4 my-6 p-8 text-center shadow-sm`}>
+Proxy:        <div className={`${isBanned ? 'bg-red-100' : 'bg-orange-100'} p-4 rounded-full mb-4`}>
           <svg className={`w-12 h-12 ${isBanned ? 'text-red-600' : 'text-orange-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
@@ -179,8 +179,8 @@ function ChatContent({ userRole, circleId, onDisconnect, onLogout }) {
 
   if (status === 'connecting') {
     return (
-      <div className="flex flex-col items-center justify-center h-[calc(100vh-120px)] bg-white border border-gray-200 rounded-xl mx-4 my-6 shadow-sm">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mb-4"></div>
+      <div className="flex flex-col items-center justify-center flex-1 min-h-0 bg-white border border-gray-200 rounded-xl mx-4 my-6 shadow-sm">
+Proxy:        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mb-4"></div>
         <p className="text-gray-500 font-medium">Connecting to circle...</p>
       </div>
     )
@@ -208,8 +208,8 @@ function ChatContent({ userRole, circleId, onDisconnect, onLogout }) {
 
   /* ── DESKTOP LAYOUT (original side-by-side) ── */
   return (
-    <div className="flex flex-col h-[calc(100vh-96px)] max-w-[1600px] mx-auto w-full bg-white overflow-hidden shadow-lg rounded-xl border border-gray-200">
-      <CircleInfoModal isOpen={isInfoModalOpen} onClose={() => setIsInfoModalOpen(false)} />
+    <div className="flex flex-col flex-1 min-h-0 max-w-[1600px] mx-auto w-full bg-white overflow-hidden shadow-lg rounded-xl border border-gray-200">
+Proxy:      <CircleInfoModal isOpen={isInfoModalOpen} onClose={() => setIsInfoModalOpen(false)} />
 
       {wsError?.code === 'message_blocked' && (
         <InterventionOverlay
@@ -347,8 +347,8 @@ export default function ChatDemo() {
 
   return (
     <Layout>
-      <div className={`bg-[#FAFBFC] relative flex flex-col ${activeCircleId ? 'h-[calc(100dvh-64px)] overflow-hidden' : 'min-h-[calc(100vh-64px)] py-8 md:py-12 overflow-x-hidden'}`}>
-        <div className="absolute top-0 left-0 w-full h-[250px] md:h-[450px] bg-gradient-to-b from-[#00d084] to-[#01a76c] z-0"></div>
+      <div className={`bg-[#FAFBFC] relative flex flex-col flex-1 min-h-0 ${activeCircleId ? 'overflow-hidden' : 'py-8 md:py-12 overflow-x-hidden'}`}>
+Proxy:        <div className="absolute top-0 left-0 w-full h-[250px] md:h-[450px] bg-gradient-to-b from-[#00d084] to-[#01a76c] z-0"></div>
 
         <div className={`mx-auto w-full relative z-10 transition-all duration-300 ${activeCircleId ? 'max-w-[1700px] px-0 flex-1 flex flex-col min-h-0' : 'max-w-5xl px-4'}`}>
           {(!token || !activeCircleId) && (
