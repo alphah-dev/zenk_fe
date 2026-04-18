@@ -70,32 +70,33 @@ function MobileChatView({ userRole, activeChannel, onBack }) {
   const { wsError, setWsError } = useChat()
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, background: 'white' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, background: '#f8fafc' }}>
       {/* Top bar with back arrow */}
       <div style={{
-        display: 'flex', alignItems: 'center', gap: '10px',
-        padding: '8px 12px',
+        display: 'flex', alignItems: 'center', gap: '8px',
+        padding: '10px 12px',
         background: 'linear-gradient(135deg, #00694c 0%, #00d084 100%)',
         color: 'white', flexShrink: 0,
+        boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
       }}>
         <button
           onClick={onBack}
           style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center' }}
         >
-          <ArrowLeftIcon style={{ width: 22, height: 22 }} />
+          <ArrowLeftIcon style={{ width: 20, height: 20 }} />
         </button>
         <div style={{
-          width: '36px', height: '36px', borderRadius: '50%',
+          width: '32px', height: '32px', borderRadius: '50%',
           background: 'rgba(255,255,255,0.2)',
           display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
         }}>
-          <HashtagIcon style={{ width: 18, height: 18 }} />
+          <HashtagIcon style={{ width: 16, height: 16 }} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: '15px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ fontSize: '14px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             #{activeChannel?.name || 'General'}
           </div>
-          <div style={{ fontSize: '10px', opacity: 0.8 }}>Circle channel</div>
+          <div style={{ fontSize: '10px', opacity: 0.8 }}>Zenk Secure Channel</div>
         </div>
         <RaiseHandButton userPersona={userRole} />
       </div>
@@ -105,16 +106,16 @@ function MobileChatView({ userRole, activeChannel, onBack }) {
         <InterventionOverlay type="block" message={wsError.reason} onDismiss={() => setWsError(null)} />
       )}
       {wsError && wsError.code !== 'message_blocked' && (
-        <div style={{ padding: '8px 12px', background: '#fee2e2', color: '#991b1b', fontSize: '11px', borderBottom: '1px solid #fca5a5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span><strong>Connection Error:</strong> {wsError.reason || wsError.code}</span>
+        <div style={{ padding: '6px 12px', background: '#fee2e2', color: '#991b1b', fontSize: '10px', borderBottom: '1px solid #fca5a5', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span><strong>Error:</strong> {wsError.reason || wsError.code}</span>
         </div>
       )}
 
       {/* Messages */}
-      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', background: '#f0f2f5' }}>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', background: '#f8fafc' }}>
         <MessageList userPersona={userRole} activeChannelId={activeChannel?.id} />
       </div>
-      <div style={{ padding: '8px 10px', borderTop: '1px solid #e5e7eb', background: '#f0f2f5' }}>
+      <div style={{ padding: '6px 8px', borderTop: '1px solid #e5e7eb', background: 'white' }}>
         <MessageInput userPersona={userRole} />
       </div>
     </div>
@@ -188,7 +189,7 @@ function ChatContent({ userRole, circleId, onDisconnect, onLogout }) {
   /* ── MOBILE LAYOUT ── */
   if (isMobile) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, height: '100%', minHeight: 0, overflow: 'hidden', borderRadius: '12px', border: '1px solid #e5e7eb', background: 'white' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, height: '100%', width: '100%', minHeight: 0, overflow: 'hidden', background: 'white' }}>
         {mobileView === 'list' ? (
           <MobileChannelList
             channels={channels}
@@ -349,7 +350,7 @@ export default function ChatDemo() {
       <div className={`bg-[#FAFBFC] relative flex flex-col ${activeCircleId ? 'h-[calc(100dvh-64px)] overflow-hidden' : 'min-h-[calc(100vh-64px)] py-8 md:py-12 overflow-x-hidden'}`}>
         <div className="absolute top-0 left-0 w-full h-[250px] md:h-[450px] bg-gradient-to-b from-[#00d084] to-[#01a76c] z-0"></div>
 
-        <div className={`mx-auto w-full relative z-10 transition-all duration-300 ${activeCircleId ? 'max-w-[1700px] px-2 flex-1 flex flex-col min-h-0 pb-2' : 'max-w-5xl px-4'}`}>
+        <div className={`mx-auto w-full relative z-10 transition-all duration-300 ${activeCircleId ? 'max-w-[1700px] px-0 flex-1 flex flex-col min-h-0' : 'max-w-5xl px-4'}`}>
           {(!token || !activeCircleId) && (
             <div className="flex flex-col items-center justify-center text-center mb-10 pt-4">
               <div className="inline-flex items-center justify-center p-3 bg-white/10 rounded-2xl backdrop-blur-md border border-white/20 mb-6 shadow-xl text-white">
