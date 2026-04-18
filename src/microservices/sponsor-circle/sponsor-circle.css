@@ -2319,7 +2319,8 @@
     .sc-root {
       flex-direction: column;
       width: 100vw;
-      overflow-x: hidden;
+      height: 100dvh; /* Better for mobile browsers */
+      overflow: hidden;
     }
     .sc-left-nav {
       position: fixed;
@@ -2374,8 +2375,8 @@
       display: flex !important;
       align-items: center;
       justify-content: space-between;
-      padding: max(env(safe-area-inset-top, 24px), 16px) 16px 12px;
-      padding-top: max(env(safe-area-inset-top, 40px), 16px); /* Aggressive notch fix */
+      padding: max(env(safe-area-inset-top, 12px), 8px) 16px 8px;
+      padding-top: max(env(safe-area-inset-top, 32px), 8px); /* Compact notch fix */
       background: var(--sc-white);
       border-bottom: 1px solid var(--sc-border);
       position: sticky;
@@ -2386,9 +2387,15 @@
       flex: 1;
       min-height: 0;
       width: 100%;
+      overflow-y: auto;
       overflow-x: hidden !important;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
+      display: flex;
+      flex-direction: column;
+    }
+    .sc-main.sc-main-chat {
+      height: auto; /* Reset fixed height */
+      flex: 1;
+      overflow: hidden;
     }
     .sc-main::-webkit-scrollbar {
       display: none;
@@ -2397,13 +2404,13 @@
       display: flex !important;
       overflow-x: auto !important;
       -webkit-overflow-scrolling: touch;
-      padding: 12px !important;
-      gap: 8px;
-      margin-bottom: 8px;
+      padding: 8px 12px !important;
+      gap: 6px;
+      margin-bottom: 4px;
       flex-wrap: nowrap !important;
       max-width: 100vw;
       scrollbar-width: none;
-      min-height: 48px !important;
+      min-height: 40px !important;
       height: auto !important;
       flex-shrink: 0 !important;
       align-items: center;

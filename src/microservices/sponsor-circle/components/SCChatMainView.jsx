@@ -143,8 +143,8 @@ function MobileChatView({ userRole, activeDM, activeChannel, onBack, dmMessages,
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, background: 'white' }}>
       {/* WhatsApp-style top bar with back arrow */}
       <div style={{
-        display: 'flex', alignItems: 'center', gap: '12px',
-        padding: '12px 16px',
+        display: 'flex', alignItems: 'center', gap: '8px',
+        padding: '8px 12px',
         background: 'linear-gradient(135deg, #1e8e6a 0%, #166d50 100%)',
         color: 'white', flexShrink: 0,
       }}>
@@ -188,7 +188,7 @@ function MobileChatView({ userRole, activeDM, activeChannel, onBack, dmMessages,
       {/* Chat messages area */}
       {isDM ? (
         <>
-          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px', background: '#f0f2f5' }}>
+          <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '12px 12px', display: 'flex', flexDirection: 'column', gap: '8px', background: '#f0f2f5' }}>
             {currentDMMessages.length === 0 && (
               <div style={{ textAlign: 'center', color: 'var(--sc-text-muted)', fontSize: '13px', marginTop: '40px' }}>
                 <UserIcon style={{ width: 36, height: 36, opacity: 0.3, margin: '0 auto 8px' }} />
@@ -238,7 +238,7 @@ function MobileChatView({ userRole, activeDM, activeChannel, onBack, dmMessages,
           <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', background: '#f0f2f5' }}>
             <MessageList userPersona={userRole} activeChannelId={activeChannel?.id} />
           </div>
-          <div style={{ padding: '10px 12px', borderTop: '1px solid var(--sc-border)', background: '#f0f2f5' }}>
+          <div style={{ padding: '8px 10px', borderTop: '1px solid var(--sc-border)', background: '#f0f2f5' }}>
             <MessageInput userPersona={userRole} />
           </div>
         </>

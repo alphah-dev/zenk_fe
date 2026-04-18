@@ -49,7 +49,7 @@ export default function MessageBubble({ message, userPersona }) {
   return (
     <div
       id={`msg-${message.id}`}
-      className={`group relative px-6 py-1.5 transition-colors ${isOwner ? 'flex flex-col items-end' : 'flex flex-col items-start'}`}
+      className={`group relative px-4 py-1 transition-colors ${isOwner ? 'flex flex-col items-end' : 'flex flex-col items-start'}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >

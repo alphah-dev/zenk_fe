@@ -62,10 +62,10 @@ export default function ChatWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex flex-col items-end">
       {/* The Popup Window */}
       {isOpen && (
-        <div className="mb-4 w-[350px] h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col transition-all duration-300 origin-bottom-right">
+        <div className="mb-4 w-[calc(100vw-32px)] md:w-[350px] h-[70vh] md:h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col transition-all duration-300 origin-bottom-right">
           
           {/* Header */}
           <div className="bg-teal-600 text-white px-4 py-3 flex justify-between items-center shadow-sm z-10">

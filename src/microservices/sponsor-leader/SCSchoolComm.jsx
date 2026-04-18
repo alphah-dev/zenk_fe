@@ -71,7 +71,7 @@ export default function SCSchoolComm() {
 
   return (
     <div className="sc-school-comm-layout" style={{
-      display: 'flex', flex: 1, minHeight: isMobile ? '100dvh' : '500px',
+      display: 'flex', flex: 1, minHeight: 0,
       background: 'white', borderRadius: isMobile ? '0' : '12px', overflow: 'hidden',
       border: isMobile ? 'none' : '1px solid var(--sc-border)', 
       boxShadow: isMobile ? 'none' : 'var(--sc-shadow)',
