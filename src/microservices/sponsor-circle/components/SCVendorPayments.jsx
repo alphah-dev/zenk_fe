@@ -43,7 +43,7 @@ export default function SCVendorPayments() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {/* Summary Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px' }}>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="sc-card" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{ width: '42px', height: '42px', borderRadius: '12px', background: '#dcfce7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <CheckCircleIcon style={{ width: 22, color: '#16a34a' }} />
@@ -74,7 +74,7 @@ export default function SCVendorPayments() {
       </div>
 
       {/* Make Payment + Deposit Alert */}
-      <div style={{ display: 'flex', gap: '12px', alignItems: 'stretch' }}>
+      <div className="flex flex-col sm:flex-row gap-3 items-stretch">
         <button
           onClick={() => setShowModal(true)}
           style={{
@@ -93,46 +93,48 @@ export default function SCVendorPayments() {
           border: '1px solid #fecaca', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444', animation: 'pulse 2s infinite' }}></div>
-            <span style={{ fontSize: '13px', fontWeight: 600, color: '#991b1b' }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ef4444', animation: 'pulse 2s infinite', flexShrink: 0 }}></div>
+            <span style={{ fontSize: '13px', fontWeight: 600, color: '#991b1b', lineHeight: 1.4 }}>
               Deposit request: ₹8,000 · Due 31 Mar · School fees — Term 2
             </span>
           </div>
-          <button style={{ fontSize: '12px', fontWeight: 700, padding: '6px 16px', borderRadius: '8px', background: '#ef4444', color: '#fff', border: 'none', cursor: 'pointer' }}>View →</button>
+          <button style={{ fontSize: '12px', fontWeight: 700, padding: '6px 16px', borderRadius: '8px', background: '#ef4444', color: '#fff', border: 'none', cursor: 'pointer', flexShrink: 0, marginLeft: '12px' }}>View →</button>
         </div>
       </div>
 
       {/* Payment History Table */}
-      <div className="sc-card">
-        <div className="sc-card-title" style={{ marginBottom: '16px' }}>Payment History</div>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 100px', gap: '12px', padding: '8px 0', borderBottom: '1px solid var(--sc-border)', fontSize: '11px', fontWeight: 700, color: 'var(--sc-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            <span>Date</span>
-            <span>Vendor</span>
-            <span>Category</span>
-            <span>Status</span>
-            <span style={{ textAlign: 'right' }}>Amount</span>
+      <div className="sc-card overflow-hidden">
+        <div className="sc-card-title p-4 sm:p-0 pb-0 sm:pb-4 mb-2 sm:mb-4">Payment History</div>
+        <div className="overflow-x-auto sc-vendor-table-wrap px-4 sm:px-0">
+          <div style={{ display: 'flex', flexDirection: 'column', minWidth: '550px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 100px', gap: '12px', padding: '8px 0', borderBottom: '1px solid var(--sc-border)', fontSize: '11px', fontWeight: 700, color: 'var(--sc-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              <span>Date</span>
+              <span>Vendor</span>
+              <span>Category</span>
+              <span>Status</span>
+              <span style={{ textAlign: 'right' }}>Amount</span>
+            </div>
+            {payments.map((p) => {
+              const catStyle = CATEGORY_COLORS[p.category] || { bg: '#f3f4f6', text: '#374151' }
+              return (
+                <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 100px', gap: '12px', padding: '12px 0', borderBottom: '1px solid var(--sc-border)', alignItems: 'center' }}>
+                  <span style={{ fontSize: '13px', color: 'var(--sc-text-muted)' }}>{p.date}</span>
+                  <span style={{ fontSize: '13px', fontWeight: 600 }}>{p.vendor}</span>
+                  <span>
+                    <span style={{ fontSize: '10px', fontWeight: 600, padding: '3px 8px', borderRadius: '4px', background: catStyle.bg, color: catStyle.text, whiteSpace: 'nowrap' }}>{p.category}</span>
+                  </span>
+                  <span>
+                    <span style={{
+                      fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '4px',
+                      background: p.status === 'Paid' ? '#dcfce7' : '#fef3c7',
+                      color: p.status === 'Paid' ? '#166534' : '#92400e',
+                    }}>{p.status}</span>
+                  </span>
+                  <span style={{ fontSize: '14px', fontWeight: 700, color: '#dc2626', textAlign: 'right' }}>-{fmt(p.amount)}</span>
+                </div>
+              )
+            })}
           </div>
-          {payments.map((p) => {
-            const catStyle = CATEGORY_COLORS[p.category] || { bg: '#f3f4f6', text: '#374151' }
-            return (
-              <div key={p.id} style={{ display: 'grid', gridTemplateColumns: '80px 1fr 120px 100px 100px', gap: '12px', padding: '12px 0', borderBottom: '1px solid var(--sc-border)', alignItems: 'center' }}>
-                <span style={{ fontSize: '13px', color: 'var(--sc-text-muted)' }}>{p.date}</span>
-                <span style={{ fontSize: '13px', fontWeight: 600 }}>{p.vendor}</span>
-                <span>
-                  <span style={{ fontSize: '10px', fontWeight: 600, padding: '3px 8px', borderRadius: '4px', background: catStyle.bg, color: catStyle.text }}>{p.category}</span>
-                </span>
-                <span>
-                  <span style={{
-                    fontSize: '10px', fontWeight: 700, padding: '3px 8px', borderRadius: '4px',
-                    background: p.status === 'Paid' ? '#dcfce7' : '#fef3c7',
-                    color: p.status === 'Paid' ? '#166534' : '#92400e',
-                  }}>{p.status}</span>
-                </span>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: '#dc2626', textAlign: 'right' }}>-{fmt(p.amount)}</span>
-              </div>
-            )
-          })}
         </div>
       </div>
 
