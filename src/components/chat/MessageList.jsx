@@ -64,7 +64,7 @@ export default function MessageList({ userPersona, activeChannelId }) {
       onScroll={handleScroll}
       className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y flex flex-col relative scroll-smooth"
     >
-Proxy:      {/* Scroll to Bottom Button */}
+      {/* Scroll to Bottom Button */}
       {showScrollDown && (
         <button
           onClick={scrollToBottom}
