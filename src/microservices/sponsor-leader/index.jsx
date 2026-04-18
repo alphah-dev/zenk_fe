@@ -98,7 +98,7 @@ export default function SponsorLeaderDashboard() {
         )}
 
         {activeTab === 'School Comm' && (
-          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }} className="sc-content-pad">
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
             <SCSchoolComm />
           </div>
         )}

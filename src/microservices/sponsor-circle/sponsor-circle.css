@@ -672,6 +672,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  flex-wrap: wrap; /* Allows dropdown button to stack under dropdown on small screens */
 }
 
 .sc-month-select {
@@ -907,6 +908,13 @@
 .sc-profile-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.sc-profile-col {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
 }
 
