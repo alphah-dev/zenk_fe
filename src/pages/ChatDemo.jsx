@@ -11,18 +11,7 @@ import Layout from '../components/Layout'
 import { ChatBubbleLeftRightIcon, KeyIcon, ArrowRightOnRectangleIcon, LockClosedIcon, ShieldCheckIcon, InformationCircleIcon, HashtagIcon, ArrowLeftIcon } from '@heroicons/react/24/outline'
 import CircleInfoModal from '../components/chat/CircleInfoModal'
 import InterventionOverlay from '../components/chat/InterventionOverlay'
-
-/* ─── Mobile hook ──────────────────────────── */
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768)
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 768px)')
-    const handler = (e) => setIsMobile(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
-  return isMobile
-}
+import { useIsMobile } from '../hooks/useIsMobile'
 
 /* ─── Mobile Channel List (WhatsApp home) ──── */
 function MobileChannelList({ channels, onSelectChannel }) {
