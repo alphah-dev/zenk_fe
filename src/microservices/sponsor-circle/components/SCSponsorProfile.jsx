@@ -167,55 +167,60 @@ export default function SCSponsorProfile({ isLeader = false }) {
           <rect width="100%" height="100%" fill="url(#hex-profile)"/>
         </svg>
 
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-          {/* Avatar with pulse ring */}
-          <div style={{ position: 'relative', flexShrink: 0 }}>
+        <div className="relative flex flex-col sm:flex-row sm:items-center gap-5">
+          {/* Top row: Avatar & Info */}
+          <div className="flex items-center gap-4 sm:gap-6 flex-1 min-w-0">
+            {/* Avatar with pulse ring */}
+            <div className="relative shrink-0">
+              <div style={{
+                position: 'absolute', inset: '-6px', borderRadius: '50%',
+                border: `2px solid ${avatarRing}`,
+                opacity: 0.5,
+                animation: 'sc-pulse-ring 2s ease-out infinite',
+              }}/>
+              <div style={{
+                width: 76, height: 76, borderRadius: '50%',
+                background: 'rgba(255,255,255,0.2)',
+                border: `3px solid ${avatarRing}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 28, fontWeight: 800, color: 'white',
+                backdropFilter: 'blur(8px)',
+              }}>
+                {PROFILE.initials}
+              </div>
+            </div>
+
+            {/* Info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-[22px] font-extrabold text-white leading-tight truncate">{PROFILE.name}</h1>
+                {isLeader && (
+                  <span className="text-[10px] bg-white/20 text-white px-2 py-0.5 rounded-md font-bold tracking-wider backdrop-blur-sm">
+                    CIRCLE COORDINATOR
+                  </span>
+                )}
+              </div>
+              <p className="text-white/80 text-[13px] mt-1 mb-0.5 truncate">{PROFILE.circle}</p>
+              <p className="text-white/65 text-[12px] m-0">
+                {isLeader ? 'Coordinator' : 'Member'} since August 2025
+              </p>
+            </div>
+          </div>
+
+          {/* Top contributor pill (stack under on mobile, far right on desktop) */}
+          <div className="shrink-0 sm:ml-auto">
             <div style={{
-              position: 'absolute', inset: '-6px', borderRadius: '50%',
-              border: `2px solid ${avatarRing}`,
-              opacity: 0.5,
-              animation: 'sc-pulse-ring 2s ease-out infinite',
-            }}/>
-            <div style={{
-              width: 76, height: 76, borderRadius: '50%',
-              background: 'rgba(255,255,255,0.2)',
-              border: `3px solid ${avatarRing}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 28, fontWeight: 800, color: 'white',
-              backdropFilter: 'blur(8px)',
+              background: 'rgba(255,255,255,0.15)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '20px',
+              padding: '6px 14px',
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              color: 'white', fontSize: 12, fontWeight: 700,
             }}>
-              {PROFILE.initials}
+              <SparklesIcon className="w-4 h-4" />
+              Top 10% Contributor
             </div>
-          </div>
-
-          {/* Info */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-              <h1 style={{ fontSize: 22, fontWeight: 800, color: 'white', margin: 0 }}>{PROFILE.name}</h1>
-              {isLeader && (
-                <span style={{ fontSize: 10, background: 'rgba(255,255,255,0.25)', color: 'white', padding: '2px 8px', borderRadius: '6px', fontWeight: 700, letterSpacing: '0.5px', backdropFilter: 'blur(4px)' }}>
-                  CIRCLE COORDINATOR
-                </span>
-              )}
-            </div>
-            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, margin: '4px 0 2px' }}>{PROFILE.circle}</p>
-            <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: 12, margin: 0 }}>
-              {isLeader ? 'Coordinator' : 'Member'} since August 2025
-            </p>
-          </div>
-
-          {/* Top contributor pill */}
-          <div style={{
-            background: 'rgba(255,255,255,0.15)',
-            backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.3)',
-            borderRadius: '20px',
-            padding: '6px 14px',
-            display: 'flex', alignItems: 'center', gap: '6px',
-            color: 'white', fontSize: 12, fontWeight: 700,
-          }}>
-            <SparklesIcon style={{ width: 14, height: 14 }} />
-            Top 10% Contributor
           </div>
         </div>
       </div>
