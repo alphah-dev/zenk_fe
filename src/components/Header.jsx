@@ -481,16 +481,13 @@ function Header({ onMenuToggle }) {
           >
             <Bars3Icon className="w-6 h-6" />
           </button>
-          <h1
-            className="font-bold"
-            style={{
-              fontFamily: "'Oriya MN', sans-serif",
-              fontSize: '32px',
-              color: '#2563eb' // blue-600
-            }}
-          >
-            ZenK
-          </h1>
+          <img 
+            src="/assets/zenk-logo.png" 
+            alt="ZenK Logo" 
+            style={{ height: '32px', objectFit: 'contain' }} 
+            className="cursor-pointer"
+            onClick={() => navigate('/')}
+          />
         </div>
 
         {/* Right - Icons */}

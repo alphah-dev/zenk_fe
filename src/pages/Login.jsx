@@ -33,25 +33,16 @@ function Login() {
     >
       {/* Branding (Top center on mobile, Top Left on desktop) */}
       <div className="absolute top-12 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-6 md:top-6 text-center md:text-left text-white z-10 w-full md:w-auto px-6">
-        <h1 
-          className="font-bold"
+        <img 
+          src="/assets/zenk-logo.png" 
+          alt="ZenK Logo" 
           style={{ 
-            fontFamily: "'Oriya MN', sans-serif",
-            fontSize: '38px',
-            textShadow: `
-              2px 2px 0px rgba(0, 0, 0, 0.8),
-              4px 4px 0px rgba(0, 0, 0, 0.6),
-              6px 6px 0px rgba(0, 0, 0, 0.4),
-              8px 8px 0px rgba(0, 0, 0, 0.2),
-              10px 10px 20px rgba(0, 0, 0, 0.5),
-              0 0 10px rgba(255, 255, 255, 0.3)
-            `,
-            transform: 'perspective(500px) rotateX(5deg)',
-            transformStyle: 'preserve-3d'
-          }}
-        >
-          ZenK
-        </h1>
+            height: '60px', 
+            objectFit: 'contain',
+            filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))'
+          }} 
+          className="mx-auto md:mx-0"
+        />
         <p 
           className="text-white mt-1"
           style={{ 

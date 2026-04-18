@@ -30,10 +30,11 @@ export default function SponsorCircleDashboard() {
   return (
     <div className="sc-root relative">
       <div className="sc-mobile-header">
-        <div className="sc-logo-text" style={{ fontSize: '18px' }}>
-          <span className="sc-logo-zen">ZEN</span>
-          <span className="sc-logo-k">K</span>
-        </div>
+        <img 
+          src="/assets/zenk-logo.png" 
+          alt="ZenK Logo" 
+          style={{ height: '24px', objectFit: 'contain' }} 
+        />
         <button onClick={() => setIsMenuOpen(true)} className="p-2 text-gray-600 bg-gray-100 rounded-md">
           <Bars3Icon className="w-6 h-6" />
         </button>

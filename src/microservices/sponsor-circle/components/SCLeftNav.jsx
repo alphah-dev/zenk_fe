@@ -47,10 +47,11 @@ export default function SCLeftNav({ activeTab, setActiveTab, isLeader = false, i
         <XMarkIcon className="w-6 h-6" />
       </button>
       <div className="sc-logo">
-        <div className="sc-logo-text">
-          <span className="sc-logo-zen">ZEN</span>
-          <span className="sc-logo-k">K</span>
-        </div>
+        <img 
+          src="/assets/zenk-logo.png" 
+          alt="ZenK Logo" 
+          style={{ height: '32px', objectFit: 'contain', marginBottom: '8px' }} 
+        />
         <span className="sc-role-badge" style={isLeader ? { background: '#f59e0b', color: '#0f172a' } : {}}>
           {isLeader ? 'Circle Coordinator' : 'Sponsor Circle'}
         </span>
