@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AcademicCapIcon } from '@heroicons/react/24/outline'
+import { useIsMobile } from '../../hooks/useIsMobile'
 
 const SCHOOL_CONTACTS = [
   { id: 'principal', name: 'Mrs. Rekha Iyer', role: 'Principal', school: "St. Mary's High School", online: true, initials: 'RI' },
@@ -33,6 +34,13 @@ export default function SCSchoolComm() {
   const [activeContact, setActiveContact] = useState('principal')
   const [messages, setMessages] = useState(INITIAL_MESSAGES)
   const [input, setInput] = useState('')
+  const isMobile = useIsMobile()
+  const [mobileView, setMobileView] = useState('list')
+
+  const handleContactOpen = (id) => {
+    setActiveContact(id)
+    if (isMobile) setMobileView('chat')
+  }
 
   const currentContact = [...SCHOOL_CONTACTS, ...STUDENTS].find(c => c.id === activeContact)
   const currentMessages = messages[activeContact] || []
@@ -68,11 +76,12 @@ export default function SCSchoolComm() {
       border: '1px solid var(--sc-border)', boxShadow: 'var(--sc-shadow)',
     }}>
       {/* Contact Rail */}
-      <div className="sc-school-contacts" style={{
-        width: '260px', borderRight: '1px solid var(--sc-border)',
-        display: 'flex', flexDirection: 'column', overflowY: 'auto',
-        background: '#f8fafc',
-      }}>
+      {(!isMobile || mobileView === 'list') && (
+        <div className="sc-school-contacts" style={{
+          width: isMobile ? '100%' : '260px', borderRight: '1px solid var(--sc-border)',
+          display: 'flex', flexDirection: 'column', overflowY: 'auto',
+          background: '#f8fafc',
+        }}>
         <div style={{
           padding: '16px', borderBottom: '1px solid var(--sc-border)',
         }}>
@@ -89,7 +98,7 @@ export default function SCSchoolComm() {
           School Staff
         </div>
         {SCHOOL_CONTACTS.map(contact => (
-          <div key={contact.id} onClick={() => setActiveContact(contact.id)} style={contactStyle(contact.id)}>
+          <div key={contact.id} onClick={() => handleContactOpen(contact.id)} style={contactStyle(contact.id)}>
             <div style={{ position: 'relative' }}>
               <div style={{
                 width: '32px', height: '32px', borderRadius: '8px',
@@ -118,7 +127,7 @@ export default function SCSchoolComm() {
           Students
         </div>
         {STUDENTS.map(student => (
-          <div key={student.id} onClick={() => setActiveContact(student.id)} style={contactStyle(student.id)}>
+          <div key={student.id} onClick={() => handleContactOpen(student.id)} style={contactStyle(student.id)}>
             <div style={{
               width: '32px', height: '32px', borderRadius: '8px',
               background: activeContact === student.id ? 'var(--sc-orange)' : 'var(--sc-orange-light)',
@@ -133,15 +142,25 @@ export default function SCSchoolComm() {
           </div>
         ))}
       </div>
+      )}
 
       {/* Chat Area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      {(!isMobile || mobileView === 'chat') && (
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
         {/* Header */}
         <div style={{
           padding: '14px 20px', borderBottom: '1px solid var(--sc-border)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {isMobile && (
+              <button 
+                onClick={() => setMobileView('list')}
+                style={{ padding: '6px', background: 'transparent', border: 'none', cursor: 'pointer', marginRight: '-2px', marginLeft: '-8px' }}
+              >
+                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              </button>
+            )}
             {currentContact && (
               <>
                 <div style={{
@@ -238,6 +257,7 @@ export default function SCSchoolComm() {
           </form>
         </div>
       </div>
+      )}
     </div>
   )
 }
