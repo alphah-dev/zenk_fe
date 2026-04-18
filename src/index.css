@@ -10,9 +10,35 @@
   box-sizing: border-box;
 }
 
+
 body {
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Scoped Scrollbar for Chat Demo */
+.chat-custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #10b981 #f1f5f9;
+}
+
+.chat-custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 10px;
+}
+
+.chat-custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #10b981;
+  border-radius: 10px;
+  border: 2px solid #f1f5f9;
+}
+
+.chat-custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #059669;
 }
 

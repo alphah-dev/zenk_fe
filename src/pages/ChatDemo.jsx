@@ -28,7 +28,7 @@ function MobileChannelList({ channels, onSelectChannel }) {
         </div>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
+      <div className="chat-custom-scrollbar" style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
         <div style={{ padding: '12px 20px 8px', fontSize: '11px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
           Circle Channels
         </div>
