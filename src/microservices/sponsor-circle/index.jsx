@@ -57,13 +57,13 @@ export default function SponsorCircleDashboard() {
         </div>
 
         {activeTab === 'My Profile' && (
-          <div style={{ padding: '0 24px 24px' }}>
+          <div className="sc-content-pad">
             <SCSponsorProfile />
           </div>
         )}
 
         {activeTab === 'My Circle' && (
-          <div style={{ padding: '0 24px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="sc-content-pad" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <SCMetricCards />
             <SCBudgetTracker />
             <SCParticipation />
@@ -77,7 +77,7 @@ export default function SponsorCircleDashboard() {
         )}
 
         {activeTab === 'Impact League' && (
-          <div style={{ padding: '0 24px 24px' }}>
+          <div className="sc-content-pad">
             <SCImpactLeague />
           </div>
         )}
@@ -89,14 +89,14 @@ export default function SponsorCircleDashboard() {
         )}
 
         {activeTab === 'Statement' && (
-          <div style={{ padding: '0 24px 24px' }}>
+          <div className="sc-content-pad">
             <SCStatementView />
           </div>
         )}
 
 
         {activeTab === 'Settings' && (
-          <div style={{ padding: '0 24px 24px' }}>
+          <div className="sc-content-pad">
             <SCSettings />
           </div>
         )}

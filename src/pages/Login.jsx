@@ -31,13 +31,13 @@ function Login() {
         backgroundImage: 'url(/LOGIN.jpg)'
       }}
     >
-      {/* Top Left - Branding */}
-      <div className="absolute top-6 left-6 text-white z-10">
+      {/* Branding (Top center on mobile, Top Left on desktop) */}
+      <div className="absolute top-12 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-6 md:top-6 text-center md:text-left text-white z-10 w-full md:w-auto px-6">
         <h1 
           className="font-bold"
           style={{ 
             fontFamily: "'Oriya MN', sans-serif",
-            fontSize: '38px', // Increased by 2 points from ~36px (text-3xl)
+            fontSize: '38px',
             textShadow: `
               2px 2px 0px rgba(0, 0, 0, 0.8),
               4px 4px 0px rgba(0, 0, 0, 0.6),
@@ -56,7 +56,7 @@ function Login() {
           className="text-white mt-1"
           style={{ 
             fontFamily: "'Oriya MN', sans-serif",
-            fontSize: '18px', // Increased by 2 points from 16px (text-base)
+            fontSize: '18px',
             textShadow: `
               1px 1px 0px rgba(0, 0, 0, 0.8),
               2px 2px 0px rgba(0, 0, 0, 0.6),
@@ -73,16 +73,16 @@ function Login() {
         </p>
       </div>
 
-      {/* Top Right - Glassmorphism Login Card */}
-      <div className="absolute top-6 right-6 z-20">
-        <div className="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-2xl p-3">
-          <form onSubmit={handleSubmit} className="flex items-end gap-2">
+      {/* Login Card (Centered below branding on mobile, Top Right on desktop) */}
+      <div className="absolute top-[180px] left-1/2 -translate-x-1/2 w-[90%] max-w-[400px] md:w-auto md:max-w-none md:translate-x-0 md:left-auto md:right-6 md:top-6 z-20">
+        <div className="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-2xl p-4 md:p-3">
+          <form onSubmit={handleSubmit} className="flex flex-col md:flex-row md:items-end gap-3 md:gap-2">
             {/* Username/Email Field */}
-            <div className="flex flex-col">
+            <div className="flex flex-col w-full md:w-auto">
               <label htmlFor="username" className="text-white font-bold text-xs mb-1">
                 Username / Email
               </label>
-              <div className="relative">
+              <div className="relative w-full">
                 <div className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none">
                   <UserIcon className="w-4 h-4 text-white" />
                 </div>
@@ -91,17 +91,17 @@ function Login() {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="pl-8 pr-3 py-1.5 rounded-lg bg-gray-200/90 backdrop-blur-sm border border-gray-300/50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent w-44 text-sm"
+                  className="w-full md:w-44 pl-8 pr-3 py-2 md:py-1.5 rounded-lg bg-gray-200/90 backdrop-blur-sm border border-gray-300/50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent text-sm"
                 />
               </div>
             </div>
 
             {/* Password Field */}
-            <div className="flex flex-col">
+            <div className="flex flex-col w-full md:w-auto">
               <label htmlFor="password" className="text-white font-bold text-xs mb-1">
                 Password
               </label>
-              <div className="relative">
+              <div className="relative w-full">
                 <div className="absolute left-2 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none">
                   <LockClosedIcon className="w-4 h-4 text-white" />
                 </div>
@@ -110,28 +110,29 @@ function Login() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-8 pr-3 py-1.5 rounded-lg bg-gray-200/90 backdrop-blur-sm border border-gray-300/50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent w-44 text-sm"
+                  className="w-full md:w-44 pl-8 pr-3 py-2 md:py-1.5 rounded-lg bg-gray-200/90 backdrop-blur-sm border border-gray-300/50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent text-sm"
                 />
               </div>
             </div>
 
             {/* Login Button */}
-            <div className="flex flex-col">
-              <label className="text-white font-bold text-xs mb-1 opacity-0 pointer-events-none">
+            <div className="flex flex-col w-full md:w-auto mt-1 md:mt-0">
+              <label className="hidden md:block text-white font-bold text-xs mb-1 opacity-0 pointer-events-none">
                 Login
               </label>
               <button
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center w-10 h-9"
+                className="w-full md:w-10 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center h-10 md:h-9"
                 aria-label="Login"
               >
+                <span className="md:hidden mr-2 font-bold text-sm">Login</span>
                 <ArrowRightOnRectangleIcon className="w-5 h-5" />
               </button>
             </div>
           </form>
 
           {/* Forgot Password & Sign Up Links */}
-          <div className="mt-2 text-center space-y-1">
+          <div className="mt-3 md:mt-2 text-center space-y-2 md:space-y-1 flex flex-col items-center">
             <a href="#" className="text-blue-300 hover:text-white text-xs underline block">
               Forgot password?
             </a>

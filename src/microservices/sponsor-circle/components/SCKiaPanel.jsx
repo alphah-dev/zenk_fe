@@ -84,7 +84,7 @@ function QuickChips() {
 }
 
 function ChatContentWrapper({ userRole }) {
-  const { wsError, setWsError, nudgeActive, dismissNudge } = useChat()
+  const { wsError, setWsError, nudgeActive, dismissNudge, channels, activeChannel, setActiveChannel } = useChat()
   
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--sc-cream)', position: 'relative', overflow: 'hidden' }}>
@@ -117,6 +117,33 @@ function ChatContentWrapper({ userRole }) {
       )}
 
       <StageBar userPersona={userRole} />
+
+      {/* Channel Switcher added inside KIA panel */}
+      {channels && channels.length > 0 && (
+        <div style={{ display: 'flex', overflowX: 'auto', gap: '8px', padding: '8px 12px', background: 'white', borderBottom: '1px solid var(--sc-border)', scrollbarWidth: 'none' }} className="sc-quick-chips">
+          {channels.map(channel => (
+            <button
+              key={channel.id}
+              onClick={() => setActiveChannel(channel)}
+              style={{
+                flexShrink: 0,
+                padding: '4px 12px',
+                borderRadius: '999px',
+                fontSize: '11px',
+                fontWeight: activeChannel?.id === channel.id ? 700 : 500,
+                background: activeChannel?.id === channel.id ? 'var(--sc-green-dark)' : 'var(--sc-cream)',
+                color: activeChannel?.id === channel.id ? 'white' : 'var(--sc-text)',
+                border: '1px solid',
+                borderColor: activeChannel?.id === channel.id ? 'var(--sc-green-dark)' : 'var(--sc-border)',
+                cursor: 'pointer'
+              }}
+            >
+              #{channel.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       <QuickChips />
       
       <div style={{ flex: 1, minHeight: 0, position: 'relative', display: 'flex', flexDirection: 'column', background: 'white' }}>

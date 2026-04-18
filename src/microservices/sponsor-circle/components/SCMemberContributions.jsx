@@ -37,7 +37,7 @@ export default function SCMemberContributions() {
         </div>
 
         {/* Breakdown boxes */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginTop: '20px' }}>
+        <div className="sc-fund-boxes" style={{ display: 'grid', gap: '12px', marginTop: '20px' }}>
           <div style={{ background: 'var(--sc-cream)', padding: '14px', borderRadius: '10px', border: '1px solid var(--sc-border)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--sc-green)' }}></div>
@@ -65,7 +65,7 @@ export default function SCMemberContributions() {
       {/* CIRCLE MEMBERS Grid */}
       <div className="sc-card">
         <div className="sc-card-title" style={{ marginBottom: '16px' }}>CIRCLE MEMBERS ({MEMBER_CONTRIBUTIONS.length})</div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+        <div className="sc-members-grid" style={{ display: 'grid', gap: '12px' }}>
           {MEMBER_CONTRIBUTIONS.map((m, i) => {
             const badgeInfo = BADGE_STYLES[m.badge]
             return (
@@ -113,17 +113,17 @@ export default function SCMemberContributions() {
       </div>
 
       {/* TRANSACTION HISTORY */}
-      <div className="sc-card">
+      <div className="sc-card sc-txn-card">
         <div className="sc-card-title" style={{ marginBottom: '16px' }}>TRANSACTION HISTORY</div>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 100px 100px', gap: '12px', padding: '8px 0', borderBottom: '1px solid var(--sc-border)', fontSize: '11px', fontWeight: 700, color: 'var(--sc-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+        <div className="sc-txn-wrapper" style={{ display: 'flex', flexDirection: 'column' }}>
+          <div className="sc-txn-row-header" style={{ display: 'grid', gap: '12px', padding: '8px 0', borderBottom: '1px solid var(--sc-border)', fontSize: '11px', fontWeight: 700, color: 'var(--sc-text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
             <span>Date</span>
             <span>Contributor</span>
             <span>Type</span>
             <span style={{ textAlign: 'right' }}>Amount</span>
           </div>
           {TRANSACTION_HISTORY.map((txn, i) => (
-            <div key={i} style={{ display: 'grid', gridTemplateColumns: '80px 1fr 100px 100px', gap: '12px', padding: '12px 0', borderBottom: i < TRANSACTION_HISTORY.length - 1 ? '1px solid var(--sc-border)' : 'none', alignItems: 'center' }}>
+            <div key={i} className="sc-txn-row-item" style={{ display: 'grid', gap: '12px', padding: '12px 0', borderBottom: i < TRANSACTION_HISTORY.length - 1 ? '1px solid var(--sc-border)' : 'none', alignItems: 'center' }}>
               <span style={{ fontSize: '13px', color: 'var(--sc-text-muted)' }}>{txn.date}</span>
               <span style={{ fontSize: '13px', fontWeight: 600 }}>{txn.contributor}</span>
               <span>

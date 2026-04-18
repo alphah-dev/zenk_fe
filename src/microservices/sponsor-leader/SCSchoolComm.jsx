@@ -62,13 +62,13 @@ export default function SCSchoolComm() {
   })
 
   return (
-    <div style={{
+    <div className="sc-school-comm-layout" style={{
       display: 'flex', height: '100%', minHeight: '500px',
       background: 'white', borderRadius: '12px', overflow: 'hidden',
       border: '1px solid var(--sc-border)', boxShadow: 'var(--sc-shadow)',
     }}>
       {/* Contact Rail */}
-      <div style={{
+      <div className="sc-school-contacts" style={{
         width: '260px', borderRight: '1px solid var(--sc-border)',
         display: 'flex', flexDirection: 'column', overflowY: 'auto',
         background: '#f8fafc',

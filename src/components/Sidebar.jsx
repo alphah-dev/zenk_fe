@@ -15,10 +15,11 @@ import {
   BookOpenIcon,
   DevicePhoneMobileIcon,
   SparklesIcon,
-  RectangleGroupIcon
+  RectangleGroupIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline'
 
-function Sidebar() {
+function Sidebar({ isOpen, onClose }) {
   const { activePersona, isStudent, isSponsor, isSupplier, isAdmin } = usePersona()
 
   // Student Navigation Items
@@ -86,34 +87,64 @@ function Sidebar() {
 
   const navItems = getNavItems()
 
+  const navContent = (
+    <div className="p-4">
+      <nav className="space-y-1">
+        {navItems.map((item) => {
+          const Icon = item.icon
+          return (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              onClick={onClose}
+              className={({ isActive }) =>
+                `flex gap-3 items-center px-4 py-3 rounded-lg transition-colors ${
+                  isActive
+                    ? 'bg-blue-50 text-blue-600 font-medium'
+                    : 'text-gray-700 hover:bg-gray-50'
+                }`
+              }
+            >
+              <Icon className="w-5 h-5" />
+              <span>{item.label}</span>
+            </NavLink>
+          )
+        })}
+      </nav>
+    </div>
+  )
+
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 h-full overflow-y-auto">
-      <div className="p-4">
-        <nav className="space-y-1">
-          {navItems.map((item) => {
-            const Icon = item.icon
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                className={({ isActive }) =>
-                  `flex gap-3 items-center px-4 py-3 rounded-lg transition-colors ${
-                    isActive
-                      ? 'bg-blue-50 text-blue-600 font-medium'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`
-                }
+    <>
+      {/* ── Desktop Sidebar (unchanged — always visible at md+) ──────── */}
+      <aside className="hidden md:block w-64 bg-white border-r border-gray-200 h-full overflow-y-auto flex-shrink-0">
+        {navContent}
+      </aside>
+
+      {/* ── Mobile Drawer (only renders below md) ────────────────────── */}
+      {isOpen && (
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          {/* Backdrop */}
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+
+          {/* Drawer Panel */}
+          <div className="relative w-72 max-w-[80vw] bg-white h-full shadow-2xl overflow-y-auto animate-slide-in-left z-10">
+            {/* Close button */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-100">
+              <h2 className="text-lg font-bold text-gray-900">Menu</h2>
+              <button
+                onClick={onClose}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <Icon className="w-5 h-5" />
-                <span>{item.label}</span>
-              </NavLink>
-            )
-          })}
-        </nav>
-      </div>
-    </aside>
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+            </div>
+            {navContent}
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 
 export default Sidebar
-
