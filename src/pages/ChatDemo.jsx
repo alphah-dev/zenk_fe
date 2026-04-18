@@ -18,11 +18,11 @@ function MobileChannelList({ channels, onSelectChannel }) {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'white', minHeight: 0 }}>
       <div style={{
-        padding: '16px 20px', borderBottom: '1px solid #e5e7eb',
+        padding: '12px 16px', borderBottom: '1px solid #e5e7eb',
         background: 'linear-gradient(135deg, #00694c 0%, #00d084 100%)',
         color: 'white',
       }}>
-        <div style={{ fontSize: '20px', fontWeight: 700, letterSpacing: '-0.3px' }}>Chats</div>
+        <div style={{ fontSize: '18px', fontWeight: 700, letterSpacing: '-0.3px' }}>Chats</div>
         <div style={{ fontSize: '12px', opacity: 0.8, marginTop: '2px' }}>
           {channels.length} channel{channels.length !== 1 ? 's' : ''} available
         </div>
@@ -37,27 +37,27 @@ function MobileChannelList({ channels, onSelectChannel }) {
             key={channel.id}
             onClick={() => onSelectChannel(channel)}
             style={{
-              display: 'flex', alignItems: 'center', gap: '14px', width: '100%',
-              padding: '14px 20px', fontSize: '15px', fontWeight: 500,
+              display: 'flex', alignItems: 'center', gap: '12px', width: '100%',
+              padding: '12px 16px', fontSize: '14px', fontWeight: 500,
               color: '#1a1a1a', background: 'transparent',
               border: 'none', borderBottom: '1px solid #f3f4f6',
               cursor: 'pointer', textAlign: 'left', transition: 'background 0.15s',
             }}
           >
             <div style={{
-              width: '44px', height: '44px', borderRadius: '50%',
+              width: '40px', height: '40px', borderRadius: '50%',
               background: '#ecfdf5', display: 'flex',
               alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             }}>
-              <HashtagIcon style={{ width: 22, height: 22, color: '#00694c' }} />
+              <HashtagIcon style={{ width: 20, height: 20, color: '#00694c' }} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontWeight: 600, fontSize: '15px', color: '#1a1a1a' }}>{channel.name}</div>
-              <div style={{ fontSize: '12px', color: '#64748b', marginTop: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div style={{ fontWeight: 600, fontSize: '14px', color: '#1a1a1a' }}>{channel.name}</div>
+              <div style={{ fontSize: '11px', color: '#64748b', marginTop: '1px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 Tap to join conversation
               </div>
             </div>
-            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
+            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', flexShrink: 0 }} />
           </button>
         ))}
       </div>
@@ -73,8 +73,8 @@ function MobileChatView({ userRole, activeChannel, onBack }) {
     <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, background: 'white' }}>
       {/* Top bar with back arrow */}
       <div style={{
-        display: 'flex', alignItems: 'center', gap: '12px',
-        padding: '12px 16px',
+        display: 'flex', alignItems: 'center', gap: '10px',
+        padding: '8px 12px',
         background: 'linear-gradient(135deg, #00694c 0%, #00d084 100%)',
         color: 'white', flexShrink: 0,
       }}>
@@ -92,10 +92,10 @@ function MobileChatView({ userRole, activeChannel, onBack }) {
           <HashtagIcon style={{ width: 18, height: 18 }} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: '16px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ fontSize: '15px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             #{activeChannel?.name || 'General'}
           </div>
-          <div style={{ fontSize: '11px', opacity: 0.8 }}>Circle channel</div>
+          <div style={{ fontSize: '10px', opacity: 0.8 }}>Circle channel</div>
         </div>
         <RaiseHandButton userPersona={userRole} />
       </div>
@@ -114,7 +114,7 @@ function MobileChatView({ userRole, activeChannel, onBack }) {
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', background: '#f0f2f5' }}>
         <MessageList userPersona={userRole} activeChannelId={activeChannel?.id} />
       </div>
-      <div style={{ padding: '10px 12px', borderTop: '1px solid #e5e7eb', background: '#f0f2f5' }}>
+      <div style={{ padding: '8px 10px', borderTop: '1px solid #e5e7eb', background: '#f0f2f5' }}>
         <MessageInput userPersona={userRole} />
       </div>
     </div>
@@ -188,7 +188,7 @@ function ChatContent({ userRole, circleId, onDisconnect, onLogout }) {
   /* ── MOBILE LAYOUT ── */
   if (isMobile) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden', borderRadius: '12px', border: '1px solid #e5e7eb', background: 'white' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', flex: 1, height: '100%', minHeight: 0, overflow: 'hidden', borderRadius: '12px', border: '1px solid #e5e7eb', background: 'white' }}>
         {mobileView === 'list' ? (
           <MobileChannelList
             channels={channels}
@@ -346,10 +346,10 @@ export default function ChatDemo() {
 
   return (
     <Layout>
-      <div className={`bg-[#FAFBFC] relative ${activeCircleId ? 'h-[calc(100vh-64px)] py-4 overflow-hidden' : 'min-h-[calc(100vh-64px)] py-12 overflow-x-hidden'}`}>
-        <div className="absolute top-0 left-0 w-full h-[450px] bg-gradient-to-b from-[#00d084] to-[#01a76c] z-0"></div>
+      <div className={`bg-[#FAFBFC] relative flex flex-col ${activeCircleId ? 'h-[calc(100dvh-64px)] overflow-hidden' : 'min-h-[calc(100vh-64px)] py-8 md:py-12 overflow-x-hidden'}`}>
+        <div className="absolute top-0 left-0 w-full h-[250px] md:h-[450px] bg-gradient-to-b from-[#00d084] to-[#01a76c] z-0"></div>
 
-        <div className={`mx-auto w-full h-full relative z-10 transition-all duration-300 ${activeCircleId ? 'max-w-[1700px] px-2 flex flex-col' : 'max-w-5xl px-4'}`}>
+        <div className={`mx-auto w-full relative z-10 transition-all duration-300 ${activeCircleId ? 'max-w-[1700px] px-2 flex-1 flex flex-col min-h-0 pb-2' : 'max-w-5xl px-4'}`}>
           {(!token || !activeCircleId) && (
             <div className="flex flex-col items-center justify-center text-center mb-10 pt-4">
               <div className="inline-flex items-center justify-center p-3 bg-white/10 rounded-2xl backdrop-blur-md border border-white/20 mb-6 shadow-xl text-white">

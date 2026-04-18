@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { ChatBubbleLeftRightIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { ChatProvider } from '../../contexts/ChatContext'
 import MessageList from './MessageList'
@@ -29,9 +30,15 @@ function WidgetInner({ circleId }) {
 }
 
 export default function ChatWidget() {
+  const location = useLocation()
   const [isOpen, setIsOpen] = useState(false)
   const [circleId, setCircleId] = useState('')
   const [activeCircleId, setActiveCircleId] = useState(null)
+  
+  // Hide widget on certain pages to avoid overlap
+  if (location.pathname === '/chat-demo') {
+    return null
+  }
   
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
