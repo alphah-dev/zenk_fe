@@ -65,31 +65,25 @@ export default function SCSponsorProfile({ isLeader = false }) {
   }
 
   const fetchImpactData = async () => {
+    setIsLoading(true);
     try {
       let items = GLOBAL_NEWS_MOCK.map(m => ({ ...m, type: 'GLOBAL', category: 'Education Stats', summary: m.text }))
       setGlobalFeed(items)
-      const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
-      const activityRes = await fetch(`${apiBase}/sponsor-circle/budget`)
-      const activityData = await activityRes.json()
-      let cItems = []
-      if (activityData.transactions) {
-        cItems = activityData.transactions.map((t, i) => ({
-          id: `act-${i}`, type: 'CIRCLE',
-          text: `${t.description}: ${t.amount > 0 ? '₹' + t.amount.toLocaleString() : ''} - Impact applied.`,
-          source: t.category, time: new Date().toISOString(),
-        }))
-      }
+      
+      // Simulate network request without hanging on dead endpoints
+      await new Promise(resolve => setTimeout(resolve, 600));
+
       const SIMULATED_STORY = [
         { id: 'sim-1', type: 'CIRCLE', text: 'Ananya D. reached 90% attendance milestone! 🎓', source: 'Student Success', time: new Date().toISOString() },
         { id: 'sim-2', type: 'CIRCLE', text: 'New member joined: Rohit Chawla is now a supporter. 🤝', source: 'Circle Growth', time: new Date().toISOString() },
         { id: 'sim-3', type: 'CIRCLE', text: 'Circle achieved 74% participation this month! 🏆', source: 'Community', time: new Date().toISOString() },
       ]
-      cItems = [...cItems, ...SIMULATED_STORY]
+      let cItems = [...SIMULATED_STORY]
       cItems.sort(() => Math.random() - 0.5)
       setCircleFeed(cItems)
     } catch (err) {
       console.error("Failed to fetch impact feed:", err)
-      setGlobalFeed(GLOBAL_NEWS_MOCK.map(m => ({ ...m, type: 'GLOBAL' })))
+      setGlobalFeed(GLOBAL_NEWS_MOCK.map(m => ({ ...m, type: 'GLOBAL', summary: m.text })))
       setCircleFeed([])
     } finally {
       setIsLoading(false)

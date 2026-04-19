@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { PersonaProvider } from './contexts/PersonaContext'
 import { NotificationProvider } from './contexts/NotificationContext'
+import { CartProvider } from './contexts/CartContext'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Home from './pages/Home'
@@ -23,6 +24,7 @@ import Mentoring from './pages/Mentoring'
 
 // Shared Pages
 import Marketplace from './pages/Marketplace'
+import VendorDashboardPage from './pages/VendorDashboardPage'
 import Analytics from './pages/Analytics'
 
 // Supplier Pages
@@ -41,8 +43,9 @@ function App() {
   return (
     <PersonaProvider>
       <NotificationProvider>
-        <Router>
-          <Routes>
+        <CartProvider>
+          <Router>
+            <Routes>
             <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
 
@@ -77,6 +80,7 @@ function App() {
 
             {/* Shared Routes */}
             <Route path="/dashboard/marketplace" element={<Marketplace />} />
+            <Route path="/dashboard/vendor-dashboard" element={<VendorDashboardPage />} />
             <Route path="/dashboard/analytics" element={<Analytics />} />
 
             {/* Chat Testing Route */}
@@ -87,8 +91,9 @@ function App() {
 
             {/* Sponsor Leader Dashboard */}
             <Route path="/sponsor-leader" element={<SponsorLeaderDashboard />} />
-          </Routes>
-        </Router>
+            </Routes>
+          </Router>
+        </CartProvider>
       </NotificationProvider>
     </PersonaProvider>
   )

@@ -17,9 +17,11 @@ import SCSettings from '../sponsor-circle/components/SCSettings'
 import SCMemberContributions from '../sponsor-circle/components/SCMemberContributions'
 import SCVendorPayments from '../sponsor-circle/components/SCVendorPayments'
 import SCSchoolComm from './SCSchoolComm'
+import EducationalMarketplace from '../shared/EducationalMarketplace'
+import VendorDashboardView from '../shared/VendorDashboardView'
 import { Bars3Icon } from '@heroicons/react/24/outline'
 
-const TABS = ['My Profile', 'My Circle', 'Member Contributions', 'Vendor Payments', 'Impact League', 'School Comm', 'Statement', 'Chat & Kia']
+const TABS = ['My Profile', 'My Circle', 'Marketplace', 'Vendor Dashboard', 'Member Contributions', 'Vendor Payments', 'Impact League', 'School Comm', 'Statement', 'Chat & Kia']
 
 export default function SponsorLeaderDashboard() {
   const [activeTab, setActiveTab] = useState('My Profile')
@@ -47,7 +49,7 @@ export default function SponsorLeaderDashboard() {
 
       <SCLeftNav activeTab={activeTab} setActiveTab={setActiveTab} isLeader={true} isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
 
-      <main className={`sc-main${activeTab === 'Chat & Kia' ? ' sc-main-chat' : ''}${activeTab === 'School Comm' ? ' sc-main-chat' : ''}`}>
+      <main className={`sc-main${(activeTab === 'Chat & Kia' || activeTab === 'School Comm' || activeTab === 'Marketplace' || activeTab === 'Vendor Dashboard') ? ' sc-main-chat' : ''}`}>
         <div className="sc-tabs">
           {TABS.map((tab) => (
             <button
@@ -110,6 +112,18 @@ export default function SponsorLeaderDashboard() {
           </div>
         )}
 
+        {activeTab === 'Marketplace' && (
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <EducationalMarketplace isLeader={true} />
+          </div>
+        )}
+
+        {activeTab === 'Vendor Dashboard' && (
+          <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <VendorDashboardView />
+          </div>
+        )}
+
         {activeTab === 'Statement' && (
           <div className="sc-content-pad">
             <SCStatementView />
@@ -123,7 +137,7 @@ export default function SponsorLeaderDashboard() {
         )}
       </main>
 
-      {activeTab !== 'Chat & Kia' && activeTab !== 'My Profile' && activeTab !== 'Settings' && activeTab !== 'School Comm' && <SCKiaPanel />}
+      {!['Chat & Kia', 'My Profile', 'Settings', 'School Comm', 'Marketplace', 'Vendor Dashboard'].includes(activeTab) && <SCKiaPanel />}
     </div>
   )
 }

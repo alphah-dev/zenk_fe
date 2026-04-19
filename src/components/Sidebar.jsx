@@ -45,6 +45,7 @@ function Sidebar({ isOpen, onClose }) {
     { path: '/dashboard/contributions', icon: CurrencyDollarIcon, label: 'Contributions' },
     { path: '/dashboard/mentoring', icon: ChatBubbleLeftRightIcon, label: 'Mentoring' },
     { path: '/dashboard/marketplace', icon: ShoppingBagIcon, label: 'Marketplace' },
+    { path: '/dashboard/vendor-dashboard', icon: BuildingStorefrontIcon, label: 'Vendor Dashboard' },
     { path: '/dashboard/analytics', icon: ChartBarIcon, label: 'Analytics' },
     { path: '/dashboard/chat-bans', icon: ShieldCheckIcon, label: 'Chat Bans' },
     { path: '/chat-demo', icon: ChatBubbleLeftRightIcon, label: 'Chat Demo' }
@@ -55,6 +56,7 @@ function Sidebar({ isOpen, onClose }) {
     { path: '/dashboard/home', icon: HomeIcon, label: 'Home' },
     { path: '/dashboard', icon: SparklesIcon, label: 'Dashboard' },
     { path: '/dashboard/catalog', icon: BuildingStorefrontIcon, label: 'Catalog' },
+    { path: '/dashboard/vendor-dashboard', icon: BuildingStorefrontIcon, label: 'Vendor Dashboard' },
     { path: '/dashboard/orders', icon: ShoppingBagIcon, label: 'Orders' },
     { path: '/dashboard/sessions', icon: ChatBubbleLeftRightIcon, label: 'Sessions' },
     { path: '/dashboard/analytics', icon: ChartBarIcon, label: 'Analytics' },

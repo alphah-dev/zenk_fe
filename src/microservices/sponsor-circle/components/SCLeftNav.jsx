@@ -11,10 +11,13 @@ import {
   AcademicCapIcon,
   XMarkIcon,
   ChatBubbleLeftRightIcon,
+  ShoppingBagIcon,
+  BuildingStorefrontIcon
 } from '@heroicons/react/24/outline'
 
 const MEMBER_NAV = [
   { label: 'Dashboard', tab: 'My Profile', icon: Squares2X2Icon },
+  { label: 'Marketplace', tab: 'Marketplace', icon: ShoppingBagIcon },
   { label: 'Chat & Kia', tab: 'Chat & Kia', icon: ChatBubbleLeftRightIcon },
   { label: 'Impact League', tab: 'Impact League', icon: TrophyIcon },
   { label: 'My Circle', tab: 'My Circle', icon: UserGroupIcon },
@@ -24,6 +27,8 @@ const MEMBER_NAV = [
 
 const LEADER_NAV = [
   { label: 'Dashboard', tab: 'My Profile', icon: Squares2X2Icon },
+  { label: 'Marketplace', tab: 'Marketplace', icon: ShoppingBagIcon },
+  { label: 'Vendor Dashboard', tab: 'Vendor Dashboard', icon: BuildingStorefrontIcon },
   { label: 'Chat & Kia', tab: 'Chat & Kia', icon: ChatBubbleLeftRightIcon },
   { label: 'Member Contributions', tab: 'Member Contributions', icon: UsersIcon },
   { label: 'Vendor Payments', tab: 'Vendor Payments', icon: CurrencyDollarIcon },
