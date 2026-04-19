@@ -69,7 +69,7 @@ export default function EducationalMarketplace({ isLeader = false }) {
   return (
     <div className="flex flex-col min-h-0 bg-[#f8fafc] overflow-y-auto">
       {/* Top Meta Header */}
-      <div className="bg-white border-b border-gray-100 shadow-sm sticky top-0 z-20">
+      <div className="bg-white border-b border-gray-100 shadow-sm md:sticky md:top-0 z-20 relative">
         <div className="w-full px-4 xl:px-8 py-3 flex flex-wrap md:flex-nowrap items-start md:items-center justify-between gap-4">
           <div className="flex items-start md:items-center gap-3 w-full md:w-auto">
             <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold border border-blue-100 flex-shrink-0">
@@ -95,7 +95,7 @@ export default function EducationalMarketplace({ isLeader = false }) {
             </div>
             <button 
               onClick={() => setIsCartOpen(true)}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-4 py-2.5 flex items-center justify-center gap-2 font-bold text-sm shadow-sm transition-colors flex-shrink-0"
+              className="hidden md:flex bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-4 py-2.5 items-center justify-center gap-2 font-bold text-sm shadow-sm transition-colors flex-shrink-0"
             >
               <ShoppingBagIcon className="w-5 h-5" />
               Cart {cartTotalCount > 0 && <span className="bg-white text-emerald-700 rounded-full w-5 h-5 flex items-center justify-center text-xs ml-1">{cartTotalCount}</span>}
@@ -138,17 +138,26 @@ export default function EducationalMarketplace({ isLeader = false }) {
 
       <div className="flex-1 w-full flex flex-col md:flex-row gap-6 xl:gap-8 px-4 xl:px-8 py-4">
         
-        {/* Horizontal Category Scroll (Mobile Only) */}
-        <div className="md:hidden -mx-4 px-4 pb-2 overflow-x-auto sc-no-scrollbar flex items-center gap-2 sticky top-[73px] bg-[#f8fafc] z-10 py-2 border-b border-gray-100">
-          {mockCategories.map(cat => (
-            <button 
-              key={cat.name}
-              onClick={() => setSelectedCategory(cat.name)}
-              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-all ${selectedCategory === cat.name ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-gray-600 border border-gray-200'}`}
-            >
-              {cat.name}
-            </button>
-          ))}
+        {/* Horizontal Category Scroll & Mobile Cart (Mobile Only) */}
+        <div className="md:hidden -mx-4 px-4 pb-2 pt-2 flex items-center justify-between gap-3 sticky top-0 bg-[#f8fafc] z-20 border-b border-gray-100 shadow-[0_2px_4px_rgba(0,0,0,0.02)]">
+          <div className="overflow-x-auto sc-no-scrollbar flex items-center gap-2 flex-1">
+            {mockCategories.map(cat => (
+              <button 
+                key={cat.name}
+                onClick={() => setSelectedCategory(cat.name)}
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-all ${selectedCategory === cat.name ? 'bg-emerald-600 text-white shadow-sm' : 'bg-white text-gray-600 border border-gray-200'}`}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+          <button 
+            onClick={() => setIsCartOpen(true)}
+            className="flex-shrink-0 relative bg-emerald-100 hover:bg-emerald-200 text-emerald-700 p-2.5 rounded-full transition-colors border border-emerald-200 shadow-sm"
+          >
+            <ShoppingBagIcon className="w-5 h-5" />
+            {cartTotalCount > 0 && <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-bold">{cartTotalCount}</span>}
+          </button>
         </div>
 
         {/* Sidebar (Desktop Only) */}
