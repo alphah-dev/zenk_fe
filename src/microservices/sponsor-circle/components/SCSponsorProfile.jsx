@@ -67,26 +67,40 @@ export default function SCSponsorProfile({ isLeader = false }) {
   const fetchImpactData = async () => {
     setIsLoading(true);
     try {
-      let items = GLOBAL_NEWS_MOCK.map(m => ({ ...m, type: 'GLOBAL', category: 'Education Stats', summary: m.text }))
-      setGlobalFeed(items)
+      // 1. Fetch Live News from The Guardian (Education in India)
+      const guardianUrl = `https://content.guardianapis.com/search?q=education%20india&api-key=test&show-fields=trailText,thumbnail&page-size=10`;
+      const newsRes = await fetch(guardianUrl);
+      const newsData = await newsRes.json();
       
-      // Simulate network request without hanging on dead endpoints
-      await new Promise(resolve => setTimeout(resolve, 600));
+      let liveItems = [];
+      if (newsData.response?.results) {
+        liveItems = newsData.response.results
+          .map(doc => curateAndCategorize(doc))
+          .filter(item => item !== null)
+          .map(item => ({ ...item, type: 'GLOBAL' }));
+      }
 
+      // 2. Combine with fallback if live list is too short
+      const fallbackItems = GLOBAL_NEWS_MOCK.map(m => ({ ...m, type: 'GLOBAL', category: 'Education Stats', summary: m.text }));
+      const finalGlobal = liveItems.length > 0 ? liveItems : fallbackItems;
+      setGlobalFeed(finalGlobal);
+      
+      // 3. Fetch Circle/Pulse data (Simulated/Mocked)
+      await new Promise(resolve => setTimeout(resolve, 400));
       const SIMULATED_STORY = [
         { id: 'sim-1', type: 'CIRCLE', text: 'Ananya D. reached 90% attendance milestone! 🎓', source: 'Student Success', time: new Date().toISOString() },
         { id: 'sim-2', type: 'CIRCLE', text: 'New member joined: Rohit Chawla is now a supporter. 🤝', source: 'Circle Growth', time: new Date().toISOString() },
         { id: 'sim-3', type: 'CIRCLE', text: 'Circle achieved 74% participation this month! 🏆', source: 'Community', time: new Date().toISOString() },
       ]
-      let cItems = [...SIMULATED_STORY]
-      cItems.sort(() => Math.random() - 0.5)
-      setCircleFeed(cItems)
+      setCircleFeed(SIMULATED_STORY.sort(() => Math.random() - 0.5));
+
     } catch (err) {
-      console.error("Failed to fetch impact feed:", err)
-      setGlobalFeed(GLOBAL_NEWS_MOCK.map(m => ({ ...m, type: 'GLOBAL', summary: m.text })))
-      setCircleFeed([])
+      console.error("Failed to fetch live impact feed:", err);
+      // Absolute fallback to mock data
+      setGlobalFeed(GLOBAL_NEWS_MOCK.map(m => ({ ...m, type: 'GLOBAL', summary: m.text })));
+      setCircleFeed([]);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
