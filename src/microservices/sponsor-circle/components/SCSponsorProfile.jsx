@@ -10,11 +10,14 @@ import {
 } from '@heroicons/react/24/solid'
 import SCJourneyAnimation from './SCJourneyAnimation'
 import SCGraduateSpotlight from './SCGraduateSpotlight'
+import apiClient from '../../../utils/apiClient'
 
 const GLOBAL_NEWS_MOCK = [
-  { id: 1, text: "Global literacy rates reach an all-time high of 87%.", source: "UNESCO Update", time: "2m ago", image: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80", url: "https://www.unesco.org/en/education" },
-  { id: 2, text: "Tech billionaire pledges $1B to bridge the rural digital divide.", source: "Tech For Good", time: "15m ago", image: "https://images.unsplash.com/photo-1542810634-71277d95dcbb?auto=format&fit=crop&w=800&q=80", url: "https://news.google.com/search?q=philanthropy+rural+education" },
-  { id: 3, text: "Community micro-sponsorships shown to increase graduation rates by 40%.", source: "Global Education Review", time: "1h ago", image: "https://images.unsplash.com/photo-1544928147-79a2dbc1f389?auto=format&fit=crop&w=800&q=80", url: "https://news.google.com/search?q=education+micro-sponsorships" },
+  { id: 1, text: "Rural India sees 15% spike in female literacy following aggressive NGO interventions.", source: "Education Ministry", time: "2h ago", image: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80", url: "#" },
+  { id: 2, text: "Tech consortium pledges ₹50 Crore to bridge the digital divide in village schools.", source: "Tech For Good", time: "5h ago", image: "https://images.unsplash.com/photo-1542810634-71277d95dcbb?auto=format&fit=crop&w=800&q=80", url: "#" },
+  { id: 3, text: "Community micro-sponsorships via blockchain shown to increase graduation rates by 40%.", source: "Global Education Review", time: "1d ago", image: "https://images.unsplash.com/photo-1544928147-79a2dbc1f389?auto=format&fit=crop&w=800&q=80", url: "#" },
+  { id: 4, text: "Over 10,000 students receive automated scholarship disbursements through ZenK Smart Contracts.", source: "Impact Daily", time: "2d ago", image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=800&q=80", url: "#" },
+  { id: 5, text: "New report: Transparent donation tracking leads to 3x higher sponsor retention rates.", source: "Nonprofit Quarterly", time: "3d ago", image: "https://images.unsplash.com/photo-1529390079861-591de354faf5?auto=format&fit=crop&w=800&q=80", url: "#" }
 ]
 
 const BADGES = [
@@ -50,8 +53,11 @@ export default function SCSponsorProfile({ isLeader = false }) {
       category = "Success Stories"
     else if (combined.includes('akshaya patra') || combined.includes('teach for india') || combined.includes('pratham') || combined.includes('giveindia') || combined.includes('ngo') || combined.includes('foundation'))
       category = "NGO/Foundation Activity"
-    if (!combined.includes('india') && !combined.includes('indian')) return null
+      
+    // Relaxed filtering for demo: We require an education keyword, but we won't strictly enforce "india" 
+    // because The Guardian is primarily a UK paper and doesn't always have matching articles daily.
     if (!combined.includes('edu') && !combined.includes('school') && !combined.includes('student') && !combined.includes('literacy')) return null
+    
     return {
       id: doc.url || doc.webUrl || Math.random(),
       text: doc.title || doc.webTitle,
@@ -64,26 +70,25 @@ export default function SCSponsorProfile({ isLeader = false }) {
     }
   }
 
+
+
   const fetchImpactData = async () => {
     setIsLoading(true);
     try {
-      // 1. Fetch Live News from The Guardian (Education in India)
-      const guardianUrl = `https://content.guardianapis.com/search?q=education%20india&api-key=test&show-fields=trailText,thumbnail&page-size=10`;
-      const newsRes = await fetch(guardianUrl);
-      const newsData = await newsRes.json();
+      // For demo purposes, we exclusively use curated thematic data 
+      // instead of live political news from The Guardian.
+      const curatedItems = GLOBAL_NEWS_MOCK.map(m => ({ 
+        ...m, 
+        type: 'GLOBAL', 
+        category: 'Field Impact', 
+        summary: m.text 
+      }));
       
-      let liveItems = [];
-      if (newsData.response?.results) {
-        liveItems = newsData.response.results
-          .map(doc => curateAndCategorize(doc))
-          .filter(item => item !== null)
-          .map(item => ({ ...item, type: 'GLOBAL' }));
-      }
-
-      // 2. Combine with fallback if live list is too short
-      const fallbackItems = GLOBAL_NEWS_MOCK.map(m => ({ ...m, type: 'GLOBAL', category: 'Education Stats', summary: m.text }));
-      const finalGlobal = liveItems.length > 0 ? liveItems : fallbackItems;
-      setGlobalFeed(finalGlobal);
+      // Artificial delay for smooth UI loading illusion
+      setTimeout(() => {
+        setGlobalFeed(curatedItems);
+        setIsLoading(false);
+      }, 600);
       
       // 3. Fetch Circle/Pulse data (Simulated/Mocked)
       await new Promise(resolve => setTimeout(resolve, 400));
