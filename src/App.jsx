@@ -14,8 +14,6 @@ import Resources from './pages/Resources'
 import Sessions from './pages/Sessions'
 import Progress from './pages/Progress'
 
-// Chat Demo
-import ChatDemo from './pages/ChatDemo'
 
 // Sponsor Pages
 import Circles from './pages/Circles'
@@ -85,8 +83,6 @@ function App() {
             <Route path="/dashboard/vendor-portal" element={<VendorPortal />} />
             <Route path="/dashboard/analytics" element={<Analytics />} />
 
-            {/* Chat Testing Route */}
-            <Route path="/chat-demo" element={<ChatDemo />} />
 
             {/* Sponsor Circle Dashboard Microservice */}
             <Route path="/sponsor-circle" element={<SponsorCircleDashboard />} />
