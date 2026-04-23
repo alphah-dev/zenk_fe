@@ -23,11 +23,19 @@ const BASE_URL = getApiBase();
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000, // 10 seconds timeout for standard requests
+  timeout: 30000, // 30 seconds — handles Railway cold start (can take 20-40s)
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+// Warm up Railway server in background (prevents cold-start timeout on first real request)
+const isProduction = BASE_URL.includes('railway.app');
+if (isProduction) {
+  axios.get(`${BASE_URL}/health`, { timeout: 60000 })
+    .then(() => console.log('[ZenkConfig] Server is warm and ready.'))
+    .catch(() => console.warn('[ZenkConfig] Server warmup ping failed — first request may be slow.'));
+}
 
 // -------------------------------------------------------------
 // REQUEST INTERCEPTOR

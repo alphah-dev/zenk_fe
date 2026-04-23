@@ -44,6 +44,8 @@ export default function EducationalMarketplace({ isLeader = false }) {
   // Fetch Products
   const [dbProducts, setDbProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadingStatus, setLoadingStatus] = useState('loading'); // 'loading' | 'warming' | 'done'
+
 
   // Checkout State
   const [checkoutStep, setCheckoutStep] = useState('cart'); // 'cart', 'details', 'payment', 'success'
@@ -59,12 +61,17 @@ export default function EducationalMarketplace({ isLeader = false }) {
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
+      setLoadingStatus('loading');
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 35000); // 35s — matches Railway cold start window
+
+      // After 3s, show "warming up server" message
+      const warmingTimer = setTimeout(() => setLoadingStatus('warming'), 3000);
       
       try {
         const res = await apiClient.get('/vendor/marketplace-products', { signal: controller.signal });
         clearTimeout(timeoutId);
+        clearTimeout(warmingTimer);
         
         const products = Array.isArray(res) ? res : (res?.products || []);
         const mapped = products.map(p => ({
@@ -78,10 +85,12 @@ export default function EducationalMarketplace({ isLeader = false }) {
           promotion: p.active_promotion_title
         }));
         setDbProducts(mapped);
+        setLoadingStatus('done');
       } catch (err) {
         console.error("Marketplace Fetch Error:", err);
-        // Fallback to empty if it fails
+        clearTimeout(warmingTimer);
         setDbProducts([]);
+        setLoadingStatus('done');
       } finally {
         setIsLoading(false);
       }
@@ -379,7 +388,17 @@ export default function EducationalMarketplace({ isLeader = false }) {
             </div>
           {/* Products Grid */}
           {isLoading ? (
-            <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div></div>
+            <div className="flex flex-col items-center justify-center py-16 gap-4">
+              <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+              {loadingStatus === 'warming' ? (
+                <div className="text-center">
+                  <p className="text-sm font-bold text-gray-700">Waking up the server...</p>
+                  <p className="text-xs text-gray-400 mt-1">This takes ~15-20 seconds on first load. Almost there!</p>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-400">Loading products...</p>
+              )}
+            </div>
           ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-12">
             {filteredProducts.map(product => (
