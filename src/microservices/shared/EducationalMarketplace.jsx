@@ -58,8 +58,14 @@ export default function EducationalMarketplace({ isLeader = false }) {
 
   useEffect(() => {
     const fetchProducts = async () => {
+      setIsLoading(true);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+      
       try {
-        const res = await apiClient.get('/vendor/marketplace/products');
+        const res = await apiClient.get('/vendor/marketplace/products', { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
         const products = Array.isArray(res) ? res : (res?.products || []);
         const mapped = products.map(p => ({
           ...p,
@@ -73,7 +79,9 @@ export default function EducationalMarketplace({ isLeader = false }) {
         }));
         setDbProducts(mapped);
       } catch (err) {
-        console.error("Failed to fetch products", err);
+        console.error("Marketplace Fetch Error:", err);
+        // Fallback to empty if it fails
+        setDbProducts([]);
       } finally {
         setIsLoading(false);
       }
