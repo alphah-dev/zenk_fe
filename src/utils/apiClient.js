@@ -10,8 +10,11 @@ import axios from 'axios';
 
 const getApiBase = () => {
   if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
-  if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('zenk'))) {
-    return 'https://deployment-production-27bd.up.railway.app';
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+  if (hostname.includes('vercel.app') || hostname.includes('zenk') || hostname.includes('railway.app')) {
+    const url = 'https://deployment-production-27bd.up.railway.app';
+    console.log('[ZenkConfig] Production environment detected. API Base:', url);
+    return url;
   }
   return 'http://localhost:8000';
 };
@@ -39,6 +42,9 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // Debug log for production connectivity
+    console.log(`[ZenkAPI] Request to: ${config.baseURL}${config.url}`);
     
     // You can also add dynamic headers here if requested by senior dev
     // e.g. config.headers['x-zenk-circle-id'] = currentCircleId;
