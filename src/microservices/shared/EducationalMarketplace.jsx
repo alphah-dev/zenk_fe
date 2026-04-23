@@ -60,7 +60,8 @@ export default function EducationalMarketplace({ isLeader = false }) {
     const fetchProducts = async () => {
       try {
         const res = await apiClient.get('/vendor/marketplace/products');
-        const mapped = res.map(p => ({
+        const products = Array.isArray(res) ? res : (res?.products || []);
+        const mapped = products.map(p => ({
           ...p,
           image: p.image_url,
           studentPrice: p.student_price,
