@@ -63,7 +63,7 @@ export default function EducationalMarketplace({ isLeader = false }) {
       const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
       
       try {
-        const res = await apiClient.get('/vendor/marketplace/products', { signal: controller.signal });
+        const res = await apiClient.get('/vendor/marketplace-products', { signal: controller.signal });
         clearTimeout(timeoutId);
         
         const products = Array.isArray(res) ? res : (res?.products || []);
