@@ -19,8 +19,29 @@ function Login() {
       window.dispatchEvent(new Event('adminLogin'))
       // Navigate to home page
       navigate('/dashboard/home')
+    } else if (username === 'vendor@zenk' && password === 'vendor123') {
+      // Vendor login — store token and route to vendor portal
+      localStorage.setItem('isAdmin', 'false')
+      localStorage.setItem('zenk_persona', 'vendor')
+      // Authenticate with backend to get a real JWT token
+      fetch('http://127.0.0.1:8000/auth/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'vendor@zenk', password: 'vendor123' }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.access_token) {
+            localStorage.setItem('zenk_token', data.access_token)
+          }
+          navigate('/dashboard/vendor-portal')
+        })
+        .catch(() => {
+          // Fallback: navigate even without token for now
+          navigate('/dashboard/vendor-portal')
+        })
     } else {
-      alert('Invalid credentials. Use admin/password')
+      alert('Invalid credentials. Use admin/password or vendor@zenk/vendor123')
     }
   }
 

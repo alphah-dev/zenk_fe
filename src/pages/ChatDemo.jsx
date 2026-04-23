@@ -361,7 +361,7 @@ export default function ChatDemo() {
             </div>
           )}
 
-          <div className="flex justify-center flex-col items-center">
+          <div className={`flex flex-col flex-1 ${!activeCircleId ? 'items-center justify-center' : 'w-full h-full'}`}>
             {!token && (
               <div className="w-full bg-white p-6 md:p-10 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] flex flex-col md:flex-row gap-8 md:gap-12 mx-auto border border-gray-100">
                 <div className="flex-1">
@@ -437,7 +437,7 @@ export default function ChatDemo() {
             ) : null}
             
             {token && activeCircleId && (
-              <div className="w-full flex-1 flex flex-col min-h-0">
+              <div className="w-full flex-1 flex flex-col overflow-hidden">
                 <ChatSandbox circleId={activeCircleId} onDisconnect={() => setActiveCircleId(null)} onLogout={handleLogout} />
               </div>
             )}

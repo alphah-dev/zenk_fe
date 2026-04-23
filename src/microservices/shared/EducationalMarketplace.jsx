@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { mockProducts, mockCategories } from './mockProducts';
+import React, { useState, useEffect } from 'react';
+import { mockCategories } from './mockProducts';
+import apiClient from '../../utils/apiClient';
 import { useCart } from '../../contexts/CartContext';
 import { 
   BuildingStorefrontIcon, 
@@ -40,6 +41,100 @@ export default function EducationalMarketplace({ isLeader = false }) {
   const [purchaseType, setPurchaseType] = useState('student');
   const [commentText, setCommentText] = useState('');
 
+  // Fetch Products
+  const [dbProducts, setDbProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Checkout State
+  const [checkoutStep, setCheckoutStep] = useState('cart'); // 'cart', 'details', 'payment', 'success'
+  const [checkoutForm, setCheckoutForm] = useState({ delivery_address: '', phone_number: '' });
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [checkoutError, setCheckoutError] = useState(null);
+
+  // Order Tracking
+  const [showTracking, setShowTracking] = useState(false);
+  const [myOrders, setMyOrders] = useState([]);
+  const [isLoadingOrders, setIsLoadingOrders] = useState(false);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await apiClient.get('/vendor/marketplace/products');
+        const mapped = res.map(p => ({
+          ...p,
+          image: p.image_url,
+          studentPrice: p.student_price,
+          studentDiscount: p.student_discount,
+          memberPrice: p.discounted_price || p.price,
+          memberDiscount: p.member_discount,
+          outOfStock: p.stock_quantity === 0,
+          promotion: p.active_promotion_title
+        }));
+        setDbProducts(mapped);
+      } catch (err) {
+        console.error("Failed to fetch products", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  const fetchMyOrders = async () => {
+    setIsLoadingOrders(true);
+    try {
+      const res = await apiClient.get('/vendor/my-orders');
+      setMyOrders(res);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoadingOrders(false);
+    }
+  };
+
+  const handleOpenTracking = () => {
+    setShowTracking(true);
+    fetchMyOrders();
+  };
+
+  const handleCheckoutSubmit = async (e) => {
+    e.preventDefault();
+    setCheckoutStep('payment');
+    setIsProcessing(true);
+    setCheckoutError(null);
+    
+    setTimeout(async () => {
+      try {
+        const cartItems = activeCartTab === 'student' ? studentCart : personalCart;
+        const payload = {
+          items: cartItems.map(item => ({
+            product_id: item.product.id,
+            quantity: 1,
+            unit_price: activeCartTab === 'student' ? item.product.studentPrice : item.product.memberPrice,
+            total_amount: activeCartTab === 'student' ? item.product.studentPrice : item.product.memberPrice,
+            vendor_id: item.product.vendor_id
+          })),
+          delivery_address: checkoutForm.delivery_address,
+          phone_number: checkoutForm.phone_number,
+          order_type: activeCartTab,
+          circle_name: isLeader ? "Ashoka Rising" : null
+        };
+
+        await apiClient.post('/vendor/orders/checkout', payload);
+        
+        setIsProcessing(false);
+        setCheckoutStep('success');
+        if (activeCartTab === 'student') clearCart('student');
+        else clearCart('personal');
+        
+      } catch (err) {
+        setIsProcessing(false);
+        setCheckoutError(err.message);
+        setCheckoutStep('details');
+      }
+    }, 2000);
+  };
+
   const handleBuyClick = (product, type) => {
     setModalProduct(product);
     setPurchaseType(type);
@@ -58,11 +153,10 @@ export default function EducationalMarketplace({ isLeader = false }) {
     setModalProduct(null);
   };
 
-  const filteredProducts = mockProducts.filter(p => {
+  const filteredProducts = dbProducts.filter(p => {
     if (selectedCategory !== 'All Items' && p.category.toLowerCase() !== selectedCategory.toLowerCase()) return false;
     if (searchTerm && !p.name.toLowerCase().includes(searchTerm.toLowerCase())) return false;
     if (filters.inStock && p.outOfStock) return false;
-    // Add more filter logic if needed
     return true;
   });
 
@@ -93,13 +187,21 @@ export default function EducationalMarketplace({ isLeader = false }) {
                  <p className="text-[10px] text-orange-600 font-medium uppercase tracking-wide mt-0.5">Circle Discount</p>
                </div>
             </div>
-            <button 
-              onClick={() => setIsCartOpen(true)}
-              className="hidden md:flex bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-4 py-2.5 items-center justify-center gap-2 font-bold text-sm shadow-sm transition-colors flex-shrink-0"
-            >
-              <ShoppingBagIcon className="w-5 h-5" />
-              Cart {cartTotalCount > 0 && <span className="bg-white text-emerald-700 rounded-full w-5 h-5 flex items-center justify-center text-xs ml-1">{cartTotalCount}</span>}
-            </button>
+            <div className="flex gap-2">
+              <button 
+                onClick={handleOpenTracking}
+                className="hidden md:flex bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded-lg px-4 py-2.5 items-center justify-center gap-2 font-bold text-sm shadow-sm transition-colors flex-shrink-0"
+              >
+                Track Orders
+              </button>
+              <button 
+                onClick={() => { setIsCartOpen(true); setCheckoutStep('cart'); }}
+                className="hidden md:flex bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg px-4 py-2.5 items-center justify-center gap-2 font-bold text-sm shadow-sm transition-colors flex-shrink-0"
+              >
+                <ShoppingBagIcon className="w-5 h-5" />
+                Cart {cartTotalCount > 0 && <span className="bg-white text-emerald-700 rounded-full w-5 h-5 flex items-center justify-center text-xs ml-1">{cartTotalCount}</span>}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -261,6 +363,9 @@ export default function EducationalMarketplace({ isLeader = false }) {
             </div>
             </div>
           {/* Products Grid */}
+          {isLoading ? (
+            <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div></div>
+          ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 pb-12">
             {filteredProducts.map(product => (
               <div key={product.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col group">
@@ -284,7 +389,15 @@ export default function EducationalMarketplace({ isLeader = false }) {
                 <div className="p-4 flex flex-col flex-1">
                   <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">{product.category}</span>
                   <h3 className="font-bold text-gray-900 text-sm leading-tight mb-1">{product.name}</h3>
-                  <p className="text-xs text-gray-500 line-clamp-2 mb-3 min-h-[32px]">{product.description}</p>
+                  <p className="text-xs text-gray-500 line-clamp-2 mb-2 min-h-[32px]">{product.description}</p>
+                  
+                  {product.promotion && (
+                    <div className="mb-3">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-orange-700 bg-orange-50 px-2 py-0.5 rounded border border-orange-200">
+                        <SparklesIcon className="w-3 h-3 text-orange-500" /> {product.promotion}
+                      </span>
+                    </div>
+                  )}
                   
                   {product.approved && (
                     <div className="mb-3">
@@ -349,6 +462,7 @@ export default function EducationalMarketplace({ isLeader = false }) {
               </div>
             ))}
           </div>
+          )}
         </div>
       </div>
 
@@ -417,106 +531,217 @@ export default function EducationalMarketplace({ isLeader = false }) {
               </button>
             </div>
 
-            <div className="flex px-4 border-b border-gray-100 shrink-0 bg-white">
-              <button 
-                onClick={() => setActiveCartTab('student')}
-                className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors ${activeCartTab === 'student' ? 'border-emerald-600 text-emerald-700' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
-              >
-                Student Fund Cart ({studentCart.length})
-              </button>
-              <button 
-                onClick={() => setActiveCartTab('personal')}
-                className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors ${activeCartTab === 'personal' ? 'border-orange-500 text-orange-700' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
-              >
-                Personal Cart ({personalCart.length})
+            {checkoutStep === 'cart' && (
+              <>
+                <div className="flex px-4 border-b border-gray-100 shrink-0 bg-white">
+                  <button 
+                    onClick={() => setActiveCartTab('student')}
+                    className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors ${activeCartTab === 'student' ? 'border-emerald-600 text-emerald-700' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                  >
+                    Student Fund Cart ({studentCart.length})
+                  </button>
+                  <button 
+                    onClick={() => setActiveCartTab('personal')}
+                    className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors ${activeCartTab === 'personal' ? 'border-orange-500 text-orange-700' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                  >
+                    Personal Cart ({personalCart.length})
+                  </button>
+                </div>
+                
+                <div className="flex-1 overflow-y-auto p-5 bg-[#f8fafc] space-y-4 shadow-inner">
+                  {activeCartTab === 'student' ? (
+                    studentCart.length === 0 ? (
+                      <div className="text-center py-10">
+                        <ShoppingBagIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                        <p className="text-gray-500 font-medium">Student cart is empty</p>
+                      </div>
+                    ) : (
+                      studentCart.map(item => (
+                        <div key={item.cartId} className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm relative group overflow-hidden">
+                           <button onClick={() => removeFromCart(item.cartId, 'student')} className="absolute top-3 right-3 text-gray-300 hover:text-red-500 p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 bg-white rounded-md">
+                             <TrashIcon className="w-4 h-4" />
+                           </button>
+                           <div className="flex items-start gap-4 mb-3">
+                             <img src={item.product.image || 'https://res.cloudinary.com/dhlmxyh9f/image/upload/v1703080000/zenk_market/placeholder.jpg'} className="w-16 h-16 rounded-lg object-cover bg-gray-50" alt="" />
+                             <div className="flex-1 min-w-0 pr-6">
+                               <p className="text-sm font-bold text-gray-900 leading-tight">{item.product.name}</p>
+                               <p className="text-emerald-700 font-bold mt-1">₹{item.product.studentPrice}</p>
+                             </div>
+                           </div>
+                        </div>
+                      ))
+                    )
+                  ) : (
+                    personalCart.length === 0 ? (
+                      <div className="text-center py-10">
+                        <ShoppingBagIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                        <p className="text-gray-500 font-medium">Personal cart is empty</p>
+                      </div>
+                    ) : (
+                      personalCart.map(item => (
+                        <div key={item.cartId} className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm relative group">
+                           <button onClick={() => removeFromCart(item.cartId, 'personal')} className="absolute top-3 right-3 text-gray-300 hover:text-red-500 p-1">
+                             <TrashIcon className="w-4 h-4" />
+                           </button>
+                           <div className="flex items-start gap-4">
+                             <img src={item.product.image || 'https://res.cloudinary.com/dhlmxyh9f/image/upload/v1703080000/zenk_market/placeholder.jpg'} className="w-16 h-16 rounded-lg object-cover bg-gray-50" alt="" />
+                             <div className="flex-1 min-w-0 pr-6">
+                               <p className="text-sm font-bold text-gray-900 leading-tight">{item.product.name}</p>
+                               <p className="text-orange-600 font-bold mt-1">₹{item.product.memberPrice}</p>
+                             </div>
+                           </div>
+                        </div>
+                      ))
+                    )
+                  )}
+                </div>
+
+                <div className="p-5 border-t border-gray-100 bg-white shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                   {activeCartTab === 'student' ? (
+                     <>
+                       <div className="flex justify-between items-center mb-4">
+                         <span className="text-sm font-bold text-gray-500 uppercase tracking-wider">Student Fund Total</span>
+                         <span className="text-xl font-bold text-gray-900 border-b-2 border-emerald-200 pb-0.5">₹{studentCart.reduce((acc, item) => acc + item.product.studentPrice, 0)}</span>
+                       </div>
+                       {isLeader ? (
+                         <button onClick={() => setCheckoutStep('details')} disabled={studentCart.length === 0} className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-sm transition-colors text-sm flex items-center justify-center gap-2">
+                           Proceed to Checkout <CheckBadgeIcon className="w-5 h-5" />
+                         </button>
+                       ) : (
+                         <div className="bg-[#f0fdf4] border border-emerald-200 p-3.5 rounded-xl text-center">
+                           <p className="text-sm font-bold text-emerald-800">Awaiting Leader Approval</p>
+                           <p className="text-[11px] font-medium text-emerald-600 mt-1 leading-relaxed">Only your Circle Leader can authorize and complete purchases from the central fund.</p>
+                         </div>
+                       )}
+                     </>
+                   ) : (
+                     <>
+                       <div className="flex justify-between items-center mb-4">
+                         <span className="text-sm font-bold text-gray-500 uppercase tracking-wider">Personal Total</span>
+                         <span className="text-xl font-bold text-gray-900 border-b-2 border-orange-200 pb-0.5">₹{personalCart.reduce((acc, item) => acc + item.product.memberPrice, 0)}</span>
+                       </div>
+                       <button onClick={() => setCheckoutStep('details')} disabled={personalCart.length === 0} className="w-full py-3.5 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-sm transition-colors text-sm flex items-center justify-center gap-2">
+                         Checkout Personally <ShoppingBagIcon className="w-5 h-5" />
+                       </button>
+                     </>
+                   )}
+                </div>
+              </>
+            )}
+
+            {checkoutStep === 'details' && (
+              <form onSubmit={handleCheckoutSubmit} className="flex flex-col h-full overflow-hidden">
+                <div className="flex-1 overflow-y-auto p-6 bg-white space-y-5">
+                  <h3 className="font-bold text-lg text-gray-900 mb-2">Delivery Details</h3>
+                  {checkoutError && (
+                    <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm font-bold border border-red-200">
+                      {checkoutError}
+                    </div>
+                  )}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Phone Number*</label>
+                    <input 
+                      required 
+                      type="tel" 
+                      pattern="[0-9]{10}"
+                      title="10 digit phone number"
+                      placeholder="e.g. 9876543210" 
+                      value={checkoutForm.phone_number}
+                      onChange={e => setCheckoutForm({...checkoutForm, phone_number: e.target.value})}
+                      className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500" 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Delivery Address*</label>
+                    <textarea 
+                      required 
+                      minLength="5"
+                      placeholder="Full street address, flat number, landmark..." 
+                      value={checkoutForm.delivery_address}
+                      onChange={e => setCheckoutForm({...checkoutForm, delivery_address: e.target.value})}
+                      className="w-full border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 resize-none h-28" 
+                    />
+                  </div>
+                </div>
+                <div className="p-5 border-t border-gray-100 bg-gray-50 flex gap-3 shrink-0">
+                  <button type="button" onClick={() => setCheckoutStep('cart')} className="flex-1 py-3.5 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl shadow-sm hover:bg-gray-50">Back</button>
+                  <button type="submit" className={`flex-[2] py-3.5 font-bold rounded-xl shadow-sm text-white ${activeCartTab === 'student' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-orange-500 hover:bg-orange-600'}`}>Continue to Payment</button>
+                </div>
+              </form>
+            )}
+
+            {checkoutStep === 'payment' && (
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white">
+                <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mb-6"></div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Processing Payment</h3>
+                <p className="text-gray-500">Please wait while we securely process your transaction...</p>
+              </div>
+            )}
+
+            {checkoutStep === 'success' && (
+              <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-white">
+                <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-6">
+                  <CheckBadgeIcon className="w-12 h-12 text-emerald-600" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Order Confirmed!</h3>
+                <p className="text-gray-500 mb-8">Your order has been placed successfully and the vendor has been notified.</p>
+                <button 
+                  onClick={() => { setIsCartOpen(false); setCheckoutStep('cart'); }} 
+                  className="w-full py-3.5 bg-gray-900 hover:bg-black text-white font-bold rounded-xl shadow-sm transition-colors"
+                >
+                  Continue Shopping
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Track Orders Modal */}
+      {showTracking && (
+        <div className="fixed inset-0 z-50 flex transition-opacity">
+          <div className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm" onClick={() => setShowTracking(false)}></div>
+          <div className="relative ml-auto w-full max-w-lg bg-white shadow-2xl h-full flex flex-col transform transition-transform duration-300">
+            <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
+              <h2 className="text-lg font-bold text-gray-900">My Orders</h2>
+              <button onClick={() => setShowTracking(false)} className="bg-gray-50 p-2 rounded-full text-gray-400 hover:text-gray-900 transition-colors">
+                <XMarkIcon className="w-5 h-5" />
               </button>
             </div>
             
             <div className="flex-1 overflow-y-auto p-5 bg-[#f8fafc] space-y-4 shadow-inner">
-              {activeCartTab === 'student' ? (
-                studentCart.length === 0 ? (
-                  <div className="text-center py-10">
-                    <ShoppingBagIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500 font-medium">Student cart is empty</p>
-                  </div>
-                ) : (
-                  studentCart.map(item => (
-                    <div key={item.cartId} className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm relative group overflow-hidden">
-                       <button onClick={() => removeFromCart(item.cartId, 'student')} className="absolute top-3 right-3 text-gray-300 hover:text-red-500 p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 bg-white rounded-md">
-                         <TrashIcon className="w-4 h-4" />
-                       </button>
-                       <div className="flex items-start gap-4 mb-3">
-                         <img src={item.product.image || 'https://res.cloudinary.com/dhlmxyh9f/image/upload/v1703080000/zenk_market/placeholder.jpg'} className="w-16 h-16 rounded-lg object-cover bg-gray-50" alt="" />
-                         <div className="flex-1 min-w-0 pr-6">
-                           <p className="text-sm font-bold text-gray-900 leading-tight">{item.product.name}</p>
-                           <p className="text-emerald-700 font-bold mt-1">₹{item.product.studentPrice}</p>
-                         </div>
-                       </div>
-                       <div className="bg-emerald-50/50 rounded-lg p-3 border border-emerald-100/50">
-                         <p className="text-xs text-gray-500 mb-1">Added by: <span className="font-bold text-gray-800">{item.addedBy.name} ({item.addedBy.role})</span></p>
-                         {item.comment ? (
-                            <p className="text-xs text-gray-700 italic border-l-2 border-emerald-300 pl-2 py-0.5">"{item.comment}"</p>
-                         ) : (
-                            <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">No comment left</p>
-                         )}
-                       </div>
-                    </div>
-                  ))
-                )
+              {isLoadingOrders ? (
+                <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div></div>
+              ) : myOrders.length === 0 ? (
+                <div className="text-center py-10">
+                  <p className="text-gray-500 font-medium">No past orders found.</p>
+                </div>
               ) : (
-                personalCart.length === 0 ? (
-                  <div className="text-center py-10">
-                    <ShoppingBagIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500 font-medium">Personal cart is empty</p>
-                  </div>
-                ) : (
-                  personalCart.map(item => (
-                    <div key={item.cartId} className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm relative group">
-                       <button onClick={() => removeFromCart(item.cartId, 'personal')} className="absolute top-3 right-3 text-gray-300 hover:text-red-500 p-1">
-                         <TrashIcon className="w-4 h-4" />
-                       </button>
-                       <div className="flex items-start gap-4">
-                         <img src={item.product.image || 'https://res.cloudinary.com/dhlmxyh9f/image/upload/v1703080000/zenk_market/placeholder.jpg'} className="w-16 h-16 rounded-lg object-cover bg-gray-50" alt="" />
-                         <div className="flex-1 min-w-0 pr-6">
-                           <p className="text-sm font-bold text-gray-900 leading-tight">{item.product.name}</p>
-                           <p className="text-orange-600 font-bold mt-1">₹{item.product.memberPrice}</p>
-                         </div>
-                       </div>
-                    </div>
-                  ))
-                )
-              )}
-            </div>
-
-            <div className="p-5 border-t border-gray-100 bg-white shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-               {activeCartTab === 'student' ? (
-                 <>
-                   <div className="flex justify-between items-center mb-4">
-                     <span className="text-sm font-bold text-gray-500 uppercase tracking-wider">Student Fund Total</span>
-                     <span className="text-xl font-bold text-gray-900 border-b-2 border-emerald-200 pb-0.5">₹{studentCart.reduce((acc, item) => acc + item.product.studentPrice, 0)}</span>
-                   </div>
-                   {isLeader ? (
-                     <button disabled={studentCart.length === 0} className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-sm transition-colors text-sm flex items-center justify-center gap-2">
-                       Approve & Complete Purchase <CheckBadgeIcon className="w-5 h-5" />
-                     </button>
-                   ) : (
-                     <div className="bg-[#f0fdf4] border border-emerald-200 p-3.5 rounded-xl text-center">
-                       <p className="text-sm font-bold text-emerald-800">Awaiting Leader Approval</p>
-                       <p className="text-[11px] font-medium text-emerald-600 mt-1 leading-relaxed">Only your Circle Leader can authorize and complete purchases from the central fund.</p>
+                myOrders.map(order => (
+                  <div key={order.id} className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+                     <div className="flex justify-between items-center mb-3">
+                       <span className="text-xs font-bold text-gray-400 font-mono">#{order.id.split('-')[0].toUpperCase()}</span>
+                       <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${
+                         order.status === 'pending' ? 'bg-orange-100 text-orange-700' :
+                         order.status === 'shipped' ? 'bg-blue-100 text-blue-700' :
+                         order.status === 'delivered' ? 'bg-emerald-100 text-emerald-700' :
+                         'bg-gray-100 text-gray-700'
+                       }`}>
+                         {order.status}
+                       </span>
                      </div>
-                   )}
-                 </>
-               ) : (
-                 <>
-                   <div className="flex justify-between items-center mb-4">
-                     <span className="text-sm font-bold text-gray-500 uppercase tracking-wider">Personal Total</span>
-                     <span className="text-xl font-bold text-gray-900 border-b-2 border-orange-200 pb-0.5">₹{personalCart.reduce((acc, item) => acc + item.product.memberPrice, 0)}</span>
-                   </div>
-                   <button disabled={personalCart.length === 0} className="w-full py-3.5 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-bold rounded-xl shadow-sm transition-colors text-sm flex items-center justify-center gap-2">
-                     Checkout Personally <ShoppingBagIcon className="w-5 h-5" />
-                   </button>
-                 </>
-               )}
+                     <p className="font-bold text-gray-900 text-sm mb-1">{order.product_name}</p>
+                     <div className="flex justify-between items-center text-sm text-gray-500 mb-3">
+                       <span>Qty: {order.quantity}</span>
+                       <span className="font-bold text-gray-900">₹{order.total_amount}</span>
+                     </div>
+                     <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-600 border border-gray-100">
+                       <p className="mb-1"><span className="font-bold text-gray-700">Type:</span> {order.order_type === 'student' ? 'Student Fund (Ashoka Rising)' : 'Personal Purchase'}</p>
+                       <p><span className="font-bold text-gray-700">Delivering to:</span> {order.delivery_address}</p>
+                     </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

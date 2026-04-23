@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard'
 import Home from './pages/Home'
 import SponsorCircleDashboard from './microservices/sponsor-circle/index'
 import SponsorLeaderDashboard from './microservices/sponsor-leader/index'
+import VendorPortal from './microservices/vendor/index'
 
 // Student Pages
 import Resources from './pages/Resources'
@@ -81,6 +82,7 @@ function App() {
             {/* Shared Routes */}
             <Route path="/dashboard/marketplace" element={<Marketplace />} />
             <Route path="/dashboard/vendor-dashboard" element={<VendorDashboardPage />} />
+            <Route path="/dashboard/vendor-portal" element={<VendorPortal />} />
             <Route path="/dashboard/analytics" element={<Analytics />} />
 
             {/* Chat Testing Route */}

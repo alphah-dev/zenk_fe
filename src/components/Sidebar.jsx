@@ -55,6 +55,7 @@ function Sidebar({ isOpen, onClose }) {
   const supplierNavItems = [
     { path: '/dashboard/home', icon: HomeIcon, label: 'Home' },
     { path: '/dashboard', icon: SparklesIcon, label: 'Dashboard' },
+    { path: '/dashboard/vendor-portal', icon: BuildingStorefrontIcon, label: 'Vendor Portal' },
     { path: '/dashboard/catalog', icon: BuildingStorefrontIcon, label: 'Catalog' },
     { path: '/dashboard/vendor-dashboard', icon: BuildingStorefrontIcon, label: 'Vendor Dashboard' },
     { path: '/dashboard/orders', icon: ShoppingBagIcon, label: 'Orders' },

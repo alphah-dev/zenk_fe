@@ -1,5 +1,6 @@
 import '../sponsor-circle/sponsor-circle.css'
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import SCLeftNav from '../sponsor-circle/components/SCLeftNav'
 import SCMetricCards from '../sponsor-circle/components/SCMetricCards'
 import SCBudgetTracker from '../sponsor-circle/components/SCBudgetTracker'
@@ -24,7 +25,9 @@ import { Bars3Icon } from '@heroicons/react/24/outline'
 const TABS = ['My Profile', 'My Circle', 'Marketplace', 'Vendor Dashboard', 'Member Contributions', 'Vendor Payments', 'Impact League', 'School Comm', 'Statement', 'Chat & Kia']
 
 export default function SponsorLeaderDashboard() {
-  const [activeTab, setActiveTab] = useState('My Profile')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const activeTab = searchParams.get('tab') || 'My Profile'
+  const setActiveTab = (tab) => setSearchParams({ tab })
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   // Close menu when tab changes on mobile
