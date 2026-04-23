@@ -268,7 +268,13 @@ export default function EducationalMarketplace({ isLeader = false }) {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Categories</h3>
             <div className="space-y-1">
-              {mockCategories.map(cat => (
+              {[
+                { name: 'All Items', count: dbProducts.length },
+                ...mockCategories.filter(c => c.name !== 'All Items').map(cat => ({
+                  ...cat,
+                  count: dbProducts.filter(p => p.category.toLowerCase() === cat.name.toLowerCase()).length
+                }))
+              ].map(cat => (
                 <button 
                   key={cat.name}
                   onClick={() => setSelectedCategory(cat.name)}
