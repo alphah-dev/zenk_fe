@@ -7,9 +7,10 @@ function Login() {
   const [username, setUsername] = useState('admin')
   const [password, setPassword] = useState('password')
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false)
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     // Hardcoded credentials check
     if (username === 'admin' && password === 'password') {
@@ -20,7 +21,8 @@ function Login() {
       // Navigate to home page
       navigate('/dashboard/home')
     } else if (username === 'vendor@zenk' && password === 'vendor123') {
-      // Vendor login — store token and route to vendor portal
+      // Vendor login — WAIT for token before navigating to prevent race condition
+      setIsLoggingIn(true)
       localStorage.setItem('isAdmin', 'false')
       localStorage.setItem('zenk_persona', 'vendor')
       const getApiBase = () => {
@@ -31,22 +33,23 @@ function Login() {
         return 'http://127.0.0.1:8000';
       };
       const API_BASE = getApiBase();
-      fetch(`${API_BASE}/auth/token`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'vendor@zenk', password: 'vendor123' }),
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.access_token) {
-            localStorage.setItem('zenk_token', data.access_token)
-          }
-          navigate('/dashboard/vendor-portal')
-        })
-        .catch(() => {
-          // Fallback: navigate even without token for now
-          navigate('/dashboard/vendor-portal')
-        })
+      try {
+        const res = await fetch(`${API_BASE}/auth/token`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: 'vendor@zenk', password: 'vendor123' }),
+        });
+        const data = await res.json();
+        if (data.access_token) {
+          localStorage.setItem('zenk_token', data.access_token);
+          console.log('[ZenkLogin] Token stored. Navigating to vendor portal.');
+        }
+      } catch (err) {
+        console.warn('[ZenkLogin] Token fetch failed, navigating without token:', err);
+      } finally {
+        setIsLoggingIn(false);
+        navigate('/dashboard/vendor-portal');
+      }
     } else {
       alert('Invalid credentials. Use admin/password or vendor@zenk/vendor123')
     }
@@ -141,11 +144,18 @@ function Login() {
               </label>
               <button
                 type="submit"
-                className="w-full md:w-10 bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center h-10 md:h-9"
+                disabled={isLoggingIn}
+                className="w-full md:w-10 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white p-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center h-10 md:h-9"
                 aria-label="Login"
               >
-                <span className="md:hidden mr-2 font-bold text-sm">Login</span>
-                <ArrowRightOnRectangleIcon className="w-5 h-5" />
+                {isLoggingIn ? (
+                  <span className="md:hidden mr-2 font-bold text-sm">Loading...</span>
+                ) : (
+                  <>
+                    <span className="md:hidden mr-2 font-bold text-sm">Login</span>
+                    <ArrowRightOnRectangleIcon className="w-5 h-5" />
+                  </>
+                )}
               </button>
             </div>
           </form>
