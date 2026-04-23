@@ -41,11 +41,6 @@ export default function EducationalMarketplace({ isLeader = false }) {
   const [purchaseType, setPurchaseType] = useState('student');
   const [commentText, setCommentText] = useState('');
 
-  // Fetch Products
-  const [dbProducts, setDbProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [loadingStatus, setLoadingStatus] = useState('loading'); // 'loading' | 'warming' | 'done'
-
 
   // Checkout State
   const [checkoutStep, setCheckoutStep] = useState('cart'); // 'cart', 'details', 'payment', 'success'
@@ -58,21 +53,27 @@ export default function EducationalMarketplace({ isLeader = false }) {
   const [myOrders, setMyOrders] = useState([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
 
+  // Fetch Products — sessionStorage cache for instant tab-switching
+  const [dbProducts, setDbProducts] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('zenk_mkt_products');
+      return cached ? JSON.parse(cached) : [];
+    } catch { return []; }
+  });
+  const [isLoading, setIsLoading] = useState(!sessionStorage.getItem('zenk_mkt_products'));
+  const [loadingStatus, setLoadingStatus] = useState('loading');
+
   useEffect(() => {
     const fetchProducts = async () => {
-      setIsLoading(true);
-      setLoadingStatus('loading');
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 35000); // 35s — matches Railway cold start window
-
-      // After 3s, show "warming up server" message
+      const timeoutId = setTimeout(() => controller.abort(), 35000);
       const warmingTimer = setTimeout(() => setLoadingStatus('warming'), 3000);
-      
+
       try {
         const res = await apiClient.get('/vendor/marketplace-products', { signal: controller.signal });
         clearTimeout(timeoutId);
         clearTimeout(warmingTimer);
-        
+
         const products = Array.isArray(res) ? res : (res?.products || []);
         const mapped = products.map(p => ({
           ...p,
@@ -85,11 +86,11 @@ export default function EducationalMarketplace({ isLeader = false }) {
           promotion: p.active_promotion_title
         }));
         setDbProducts(mapped);
+        sessionStorage.setItem('zenk_mkt_products', JSON.stringify(mapped));
         setLoadingStatus('done');
       } catch (err) {
         console.error("Marketplace Fetch Error:", err);
         clearTimeout(warmingTimer);
-        setDbProducts([]);
         setLoadingStatus('done');
       } finally {
         setIsLoading(false);
