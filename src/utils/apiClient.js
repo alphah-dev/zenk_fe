@@ -8,8 +8,15 @@ import axios from 'axios';
  * standardizing error responses.
  */
 
-// We default to port 8000 (Python FastAPI backend) or the env variable
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+const getApiBase = () => {
+  if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
+  if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('zenk'))) {
+    return 'https://deployment-production-27bd.up.railway.app';
+  }
+  return 'http://localhost:8000';
+};
+
+const BASE_URL = getApiBase();
 
 const apiClient = axios.create({
   baseURL: BASE_URL,

@@ -23,7 +23,14 @@ function Login() {
       // Vendor login — store token and route to vendor portal
       localStorage.setItem('isAdmin', 'false')
       localStorage.setItem('zenk_persona', 'vendor')
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      const getApiBase = () => {
+        if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
+        if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('zenk'))) {
+          return 'https://deployment-production-27bd.up.railway.app';
+        }
+        return 'http://127.0.0.1:8000';
+      };
+      const API_BASE = getApiBase();
       fetch(`${API_BASE}/auth/token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

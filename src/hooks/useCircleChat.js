@@ -63,7 +63,14 @@ export function useCircleChat(circleId, userRole = 'sponsor') {
     }
 
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
-    const host = import.meta.env.VITE_API_WS_HOST || window.location.host
+    const getWsHost = () => {
+      if (import.meta.env.VITE_API_WS_HOST) return import.meta.env.VITE_API_WS_HOST;
+      if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('zenk'))) {
+        return 'deployment-production-27bd.up.railway.app';
+      }
+      return window.location.host;
+    };
+    const host = getWsHost();
     const url = `${protocol}://${host}/ws/circle/${cid}?token=${encodeURIComponent(token)}&role=${encodeURIComponent(userRole)}`
 
     setStatus('connecting')
@@ -257,7 +264,14 @@ export function useCircleChat(circleId, userRole = 'sponsor') {
     if (!token) return
 
     try {
-      const apiHost = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+      const getApiBase = () => {
+        if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
+        if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('zenk'))) {
+          return 'https://deployment-production-27bd.up.railway.app';
+        }
+        return 'http://localhost:8000';
+      };
+      const apiHost = getApiBase();
       const response = await fetch(`${apiHost}/chat/messages/${channelId}?token=${encodeURIComponent(token)}&limit=50`)
       if (!response.ok) return
       const history = await response.json()
@@ -283,7 +297,14 @@ export function useCircleChat(circleId, userRole = 'sponsor') {
         return
       }
 
-      const apiHost = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+      const getApiBase = () => {
+        if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
+        if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('zenk'))) {
+          return 'https://deployment-production-27bd.up.railway.app';
+        }
+        return 'http://localhost:8000';
+      };
+      const apiHost = getApiBase();
       const response = await fetch(`${apiHost}/chat/messages/${channelId}?token=${encodeURIComponent(token)}&before=${encodeURIComponent(before)}&limit=100`)
       if (!response.ok) return
       const olderHistory = await response.json()
@@ -312,7 +333,14 @@ export function useCircleChat(circleId, userRole = 'sponsor') {
     if (!token) return
 
     try {
-      const apiHost = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+      const getApiBase = () => {
+        if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
+        if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('zenk'))) {
+          return 'https://deployment-production-27bd.up.railway.app';
+        }
+        return 'http://localhost:8000';
+      };
+      const apiHost = getApiBase();
       const response = await fetch(`${apiHost}/chat/circle/${circleId}/members?token=${encodeURIComponent(token)}`)
       if (!response.ok) return
       const fetchedMembers = await response.json()

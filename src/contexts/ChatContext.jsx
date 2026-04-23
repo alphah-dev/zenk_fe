@@ -9,7 +9,15 @@ export const useChat = () => {
   return ctx
 }
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+const getApiBase = () => {
+  if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
+  if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('zenk'))) {
+    return 'https://deployment-production-27bd.up.railway.app';
+  }
+  return 'http://localhost:8000';
+};
+
+const API_BASE = getApiBase();
 
 export const ChatProvider = ({ circleId, userRole = 'sponsor', children }) => {
   const chat = useCircleChat(circleId, userRole)
