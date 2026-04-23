@@ -23,8 +23,8 @@ function Login() {
       // Vendor login — store token and route to vendor portal
       localStorage.setItem('isAdmin', 'false')
       localStorage.setItem('zenk_persona', 'vendor')
-      // Authenticate with backend to get a real JWT token
-      fetch('http://127.0.0.1:8000/auth/token', {
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+      fetch(`${API_BASE}/auth/token`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: 'vendor@zenk', password: 'vendor123' }),
