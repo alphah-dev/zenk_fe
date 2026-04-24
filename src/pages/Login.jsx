@@ -4,54 +4,60 @@ import { UserIcon, LockClosedIcon, ArrowRightOnRectangleIcon } from '@heroicons/
 import SignupModal from '../components/SignupModal'
 
 function Login() {
-  const [username, setUsername] = useState('admin')
-  const [password, setPassword] = useState('password')
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [isSignupModalOpen, setIsSignupModalOpen] = useState(false)
   const [isLoggingIn, setIsLoggingIn] = useState(false)
+  const [loginError, setLoginError] = useState('')
   const navigate = useNavigate()
+
+  const getApiBase = () => {
+    if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
+    if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('zenk'))) {
+      return 'https://deployment-production-27bd.up.railway.app';
+    }
+    return 'http://127.0.0.1:8000';
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    // Hardcoded credentials check
+    setLoginError('')
+
+    // Demo admin shortcut (no backend call needed for admin demo)
     if (username === 'admin' && password === 'password') {
-      // Store admin login state
-      localStorage.setItem('isAdmin', 'true')
-      // Dispatch custom event to notify NotificationContext
+      sessionStorage.setItem('isAdmin', 'true')
       window.dispatchEvent(new Event('adminLogin'))
-      // Navigate to home page
       navigate('/dashboard/home')
-    } else if (username === 'vendor@zenk' && password === 'vendor123') {
-      // Vendor login — WAIT for token before navigating to prevent race condition
-      setIsLoggingIn(true)
-      localStorage.setItem('isAdmin', 'false')
-      localStorage.setItem('zenk_persona', 'vendor')
-      const getApiBase = () => {
-        if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
-        if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('zenk'))) {
-          return 'https://deployment-production-27bd.up.railway.app';
-        }
-        return 'http://127.0.0.1:8000';
-      };
+      return
+    }
+
+    // All other logins go through the real backend
+    setIsLoggingIn(true)
+    try {
       const API_BASE = getApiBase();
-      try {
-        const res = await fetch(`${API_BASE}/auth/token`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: 'vendor@zenk', password: 'vendor123' }),
-        });
-        const data = await res.json();
-        if (data.access_token) {
-          localStorage.setItem('zenk_token', data.access_token);
-          console.log('[ZenkLogin] Token stored. Navigating to vendor portal.');
-        }
-      } catch (err) {
-        console.warn('[ZenkLogin] Token fetch failed, navigating without token:', err);
-      } finally {
-        setIsLoggingIn(false);
+      const res = await fetch(`${API_BASE}/auth/token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: username, password }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setLoginError(data.detail || 'Invalid credentials. Please try again.')
+        return
+      }
+
+      if (data.access_token) {
+        // sessionStorage: cleared when browser tab closes (safer than localStorage)
+        sessionStorage.setItem('zenk_token', data.access_token);
+        sessionStorage.setItem('isAdmin', 'false')
+        sessionStorage.setItem('zenk_persona', 'vendor')
         navigate('/dashboard/vendor-portal');
       }
-    } else {
-      alert('Invalid credentials. Use admin/password or vendor@zenk/vendor123')
+    } catch (err) {
+      setLoginError('Cannot connect to server. Please check your connection.')
+    } finally {
+      setIsLoggingIn(false)
     }
   }
 
@@ -159,6 +165,13 @@ function Login() {
               </button>
             </div>
           </form>
+
+          {/* Login Error Message */}
+          {loginError && (
+            <div className="mt-2 text-center text-xs text-red-300 bg-red-900/30 border border-red-500/30 rounded-lg px-3 py-2">
+              {loginError}
+            </div>
+          )}
 
           {/* Forgot Password & Sign Up Links */}
           <div className="mt-3 md:mt-2 text-center space-y-2 md:space-y-1 flex flex-col items-center">
