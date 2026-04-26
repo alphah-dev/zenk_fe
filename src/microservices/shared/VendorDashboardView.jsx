@@ -56,7 +56,8 @@ export default function VendorDashboardView() {
   const [liveRequests, setLiveRequests] = useState([]);
   const [liveKPIs, setLiveKPIs] = useState({
     totalOrders: 0,
-    totalSpent: 0,
+    circleSpent: 0,
+    personalSpent: 0,
     pendingRequests: 0,
     circleBalance: 45000 // Example mock balance
   });
@@ -75,13 +76,15 @@ export default function VendorDashboardView() {
         setLiveOrders(orders);
         setLiveRequests(requests);
         
-        const spent = orders.reduce((sum, order) => sum + (order.total_amount || 0), 0);
+        const circleSpent = orders.filter(o => o.order_type === 'student').reduce((sum, order) => sum + (order.total_amount || 0), 0);
+        const personalSpent = orders.filter(o => o.order_type === 'personal').reduce((sum, order) => sum + (order.total_amount || 0), 0);
         const pendingReqsCount = requests.filter(r => r.status === 'pending').length;
         
         setLiveKPIs(prev => ({
           ...prev,
           totalOrders: orders.length,
-          totalSpent: spent,
+          circleSpent,
+          personalSpent,
           pendingRequests: pendingReqsCount
         }));
       } catch (err) {
@@ -95,10 +98,11 @@ export default function VendorDashboardView() {
 
   const kpiCards = [
     { title: 'Total Orders', value: liveKPIs.totalOrders.toString(), icon: ShoppingBagIcon, color: 'blue' },
-    { title: 'Total Spent (Fund)', value: `₹${liveKPIs.totalSpent.toLocaleString()}`, icon: CurrencyDollarIcon, color: 'green' },
+    { title: 'Circle Spent', value: `₹${liveKPIs.circleSpent.toLocaleString()}`, icon: CurrencyDollarIcon, color: 'emerald' },
+    { title: 'Personal Spent', value: `₹${liveKPIs.personalSpent.toLocaleString()}`, icon: CurrencyDollarIcon, color: 'orange' },
     { title: 'Pending Requests', value: liveKPIs.pendingRequests.toString(), icon: BuildingStorefrontIcon, color: 'purple' },
-    { title: 'Circle Balance', value: `₹${liveKPIs.circleBalance.toLocaleString()}`, icon: ChartBarIcon, color: 'yellow' }
   ];
+
 
   return (
     <div className="flex flex-col min-h-0 bg-[#f8fafc] overflow-y-auto w-full">
@@ -147,75 +151,127 @@ export default function VendorDashboardView() {
           })}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* Recent Orders */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-gray-900">Recent Orders</h2>
-              <button 
-                onClick={() => {
-                  const modalContent = liveOrders.length === 0 ? 
-                    <p>No order history found.</p> : 
-                    <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
-                      {liveOrders.map(order => (
-                        <div key={order.id} className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <span className="font-mono text-xs font-bold text-gray-500 mr-2">#{order.id.substring(0, 8).toUpperCase()}</span>
-                              <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${order.status === 'processing' ? 'bg-orange-100 text-orange-700' : order.status === 'shipped' ? 'bg-blue-100 text-blue-700' : order.status === 'delivered' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-700'}`}>
-                                {order.status}
-                              </span>
-                            </div>
-                            <span className="font-bold text-gray-900">₹{order.total_amount}</span>
-                          </div>
-                          <p className="text-sm font-bold text-gray-800">{order.product_name || 'Educational Item'}</p>
-                          <p className="text-xs text-gray-500 mt-1">{new Date(order.created_at).toLocaleDateString()} • {order.buyer_name}</p>
-                        </div>
-                      ))}
-                    </div>;
-                  setActiveModal({ title: 'All Orders', content: modalContent });
-                }} 
-                className="text-sm font-bold text-emerald-600 hover:text-emerald-700"
-              >
-                View All
-              </button>
-            </div>
-            <div className="divide-y divide-gray-100">
-              {isLoading ? (
-                <div className="p-8 text-center text-gray-500 font-medium">Loading recent orders...</div>
-              ) : liveOrders.length === 0 ? (
-                <div className="p-8 text-center text-gray-500 font-medium">No recent orders found.</div>
-              ) : (
-                liveOrders.slice(0, 5).map(order => (
-                  <div key={order.id} className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50 transition-colors">
-                    <div>
-                      <div className="flex items-center gap-3 mb-1">
-                        <span className="font-mono text-sm font-bold text-gray-500">#{order.id.substring(0, 8).toUpperCase()}</span>
-                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${order.status === 'processing' ? 'bg-orange-100 text-orange-700' : order.status === 'shipped' ? 'bg-blue-100 text-blue-700' : order.status === 'delivered' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-700'}`}>
-                          {order.status}
-                        </span>
-                      </div>
-                      <p className="font-bold text-gray-900 text-sm mb-1">{order.product_name || 'Educational Item'}</p>
-                      <p className="text-xs text-gray-500">{order.buyer_name || 'Sponsor'} • {new Date(order.created_at).toLocaleDateString()}</p>
-                    </div>
-                    <div className="flex items-center justify-between sm:flex-col sm:items-end gap-2">
-                      <p className="font-bold text-lg text-gray-900">₹{order.total_amount}</p>
-                      <button 
-                        onClick={() => setActiveModal({ title: `Order ${order.id.substring(0, 8).toUpperCase()}`, content: `Order tracking and details for ${order.product_name || 'item'} will be displayed here.` })}
-                        className="text-xs font-bold text-gray-600 border border-gray-200 bg-white hover:bg-gray-50 px-3 py-1.5 rounded-lg shadow-sm"
-                      >
-                        View details
-                      </button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
+         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+           
+           {/* Recent Circle Orders */}
+           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-emerald-50/30">
+               <div className="flex items-center gap-2">
+                 <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                 <h2 className="text-sm font-bold text-gray-900 uppercase tracking-tight">Recent Circle Orders</h2>
+               </div>
+               <button 
+                 onClick={() => {
+                   const orders = liveOrders.filter(o => o.order_type === 'student');
+                   const modalContent = orders.length === 0 ? 
+                     <p>No circle order history found.</p> : 
+                     <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+                       {orders.map(order => (
+                         <div key={order.id} className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
+                           <div className="flex justify-between items-start mb-2">
+                             <div>
+                               <span className="font-mono text-xs font-bold text-gray-500 mr-2">#{order.id.substring(0, 8).toUpperCase()}</span>
+                               <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${order.status === 'processing' ? 'bg-orange-100 text-orange-700' : order.status === 'shipped' ? 'bg-blue-100 text-blue-700' : order.status === 'delivered' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-700'}`}>
+                                 {order.status}
+                               </span>
+                             </div>
+                             <span className="font-bold text-gray-900">₹{order.total_amount}</span>
+                           </div>
+                           <p className="text-sm font-bold text-gray-800">{order.product_name || 'Educational Item'}</p>
+                           <p className="text-xs text-gray-500 mt-1">{new Date(order.created_at).toLocaleDateString()} • {order.buyer_name}</p>
+                         </div>
+                       ))}
+                     </div>;
+                   setActiveModal({ title: 'Circle Order History', content: modalContent });
+                 }} 
+                 className="text-[11px] font-bold text-emerald-600 hover:text-emerald-700 uppercase"
+               >
+                 View All
+               </button>
+             </div>
+             <div className="divide-y divide-gray-100">
+               {isLoading ? (
+                 <div className="p-8 text-center text-gray-500 text-xs">Loading orders...</div>
+               ) : liveOrders.filter(o => o.order_type === 'student').length === 0 ? (
+                 <div className="p-8 text-center text-gray-400 text-xs italic">No circle orders yet.</div>
+               ) : (
+                 liveOrders.filter(o => o.order_type === 'student').slice(0, 4).map(order => (
+                   <div key={order.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                     <div className="min-w-0">
+                       <p className="font-bold text-gray-900 text-xs truncate mb-0.5">{order.product_name || 'Educational Item'}</p>
+                       <p className="text-[10px] text-gray-500 truncate">{order.buyer_name} • {new Date(order.created_at).toLocaleDateString()}</p>
+                     </div>
+                     <div className="flex flex-col items-end shrink-0 ml-2">
+                       <p className="font-bold text-sm text-gray-900">₹{order.total_amount}</p>
+                       <span className={`text-[9px] font-bold uppercase tracking-tighter ${order.status === 'delivered' ? 'text-emerald-600' : 'text-orange-500'}`}>{order.status}</span>
+                     </div>
+                   </div>
+                 ))
+               )}
+             </div>
+           </div>
 
-          {/* Quick Actions & Status */}
-          <div className="space-y-6">
+           {/* Recent Personal Purchases */}
+           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-orange-50/30">
+               <div className="flex items-center gap-2">
+                 <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                 <h2 className="text-sm font-bold text-gray-900 uppercase tracking-tight">Recent Personal Purchases</h2>
+               </div>
+               <button 
+                 onClick={() => {
+                   const orders = liveOrders.filter(o => o.order_type === 'personal');
+                   const modalContent = orders.length === 0 ? 
+                     <p>No personal purchase history found.</p> : 
+                     <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+                       {orders.map(order => (
+                         <div key={order.id} className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
+                           <div className="flex justify-between items-start mb-2">
+                             <div>
+                               <span className="font-mono text-xs font-bold text-gray-500 mr-2">#{order.id.substring(0, 8).toUpperCase()}</span>
+                               <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${order.status === 'processing' ? 'bg-orange-100 text-orange-700' : order.status === 'shipped' ? 'bg-blue-100 text-blue-700' : order.status === 'delivered' ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-700'}`}>
+                                 {order.status}
+                               </span>
+                             </div>
+                             <span className="font-bold text-gray-900">₹{order.total_amount}</span>
+                           </div>
+                           <p className="text-sm font-bold text-gray-800">{order.product_name || 'Educational Item'}</p>
+                           <p className="text-xs text-gray-500 mt-1">{new Date(order.created_at).toLocaleDateString()} • {order.buyer_name}</p>
+                         </div>
+                       ))}
+                     </div>;
+                   setActiveModal({ title: 'Personal Purchase History', content: modalContent });
+                 }} 
+                 className="text-[11px] font-bold text-orange-600 hover:text-orange-700 uppercase"
+               >
+                 View All
+               </button>
+             </div>
+             <div className="divide-y divide-gray-100">
+               {isLoading ? (
+                 <div className="p-8 text-center text-gray-500 text-xs">Loading orders...</div>
+               ) : liveOrders.filter(o => o.order_type === 'personal').length === 0 ? (
+                 <div className="p-8 text-center text-gray-400 text-xs italic">No personal purchases yet.</div>
+               ) : (
+                 liveOrders.filter(o => o.order_type === 'personal').slice(0, 4).map(order => (
+                   <div key={order.id} className="p-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                     <div className="min-w-0">
+                       <p className="font-bold text-gray-900 text-xs truncate mb-0.5">{order.product_name || 'Educational Item'}</p>
+                       <p className="text-[10px] text-gray-500 truncate">{order.buyer_name} • {new Date(order.created_at).toLocaleDateString()}</p>
+                     </div>
+                     <div className="flex flex-col items-end shrink-0 ml-2">
+                       <p className="font-bold text-sm text-gray-900">₹{order.total_amount}</p>
+                       <span className={`text-[9px] font-bold uppercase tracking-tighter ${order.status === 'delivered' ? 'text-emerald-600' : 'text-orange-500'}`}>{order.status}</span>
+                     </div>
+                   </div>
+                 ))
+               )}
+             </div>
+           </div>
+         </div>
+
+         {/* Third row for Requests and Status */}
+         <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="bg-blue-600 rounded-xl shadow-sm p-6 text-white relative overflow-hidden">
                <div className="absolute -right-6 -top-6 text-blue-500 opacity-30">
                  <BuildingStorefrontIcon className="w-32 h-32" />
@@ -299,8 +355,7 @@ export default function VendorDashboardView() {
             </div>
           </div>
 
-        </div>
-      </div>
+
 
       {activeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm shadow-2xl transition-opacity animate-in fade-in">
@@ -413,6 +468,7 @@ export default function VendorDashboardView() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }
