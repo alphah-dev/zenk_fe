@@ -173,7 +173,7 @@ export default function EducationalMarketplace({ isLeader = false }) {
     fetchKiaRecommendation();
   }, []);
 
-  const handleAddToCart = async (product, purchaseType = 'student', comment = '') => {
+  const handleBuyClick = async (product, purchaseType = 'student', comment = '') => {
     setModalProduct(product);
     setPurchaseType(purchaseType);
     setCommentText(comment);
