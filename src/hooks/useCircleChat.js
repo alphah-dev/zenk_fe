@@ -65,7 +65,8 @@ export function useCircleChat(circleId, userRole = 'sponsor') {
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
     const getWsHost = () => {
       if (import.meta.env.VITE_API_WS_HOST) return import.meta.env.VITE_API_WS_HOST;
-      if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('zenk'))) {
+      const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+      if (hostname.includes('vercel.app') || hostname.includes('zenk') || hostname.includes('railway.app')) {
         return 'deployment-production-27bd.up.railway.app';
       }
       return window.location.host;
@@ -266,7 +267,8 @@ export function useCircleChat(circleId, userRole = 'sponsor') {
     try {
       const getApiBase = () => {
         if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
-        if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('zenk'))) {
+        const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+        if (hostname.includes('vercel.app') || hostname.includes('zenk') || hostname.includes('railway.app')) {
           return 'https://deployment-production-27bd.up.railway.app';
         }
         return 'http://localhost:8000';
@@ -299,7 +301,8 @@ export function useCircleChat(circleId, userRole = 'sponsor') {
 
       const getApiBase = () => {
         if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
-        if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('zenk'))) {
+        const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+        if (hostname.includes('vercel.app') || hostname.includes('zenk') || hostname.includes('railway.app')) {
           return 'https://deployment-production-27bd.up.railway.app';
         }
         return 'http://localhost:8000';
@@ -335,7 +338,8 @@ export function useCircleChat(circleId, userRole = 'sponsor') {
     try {
       const getApiBase = () => {
         if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
-        if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('zenk'))) {
+        const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+        if (hostname.includes('vercel.app') || hostname.includes('zenk') || hostname.includes('railway.app')) {
           return 'https://deployment-production-27bd.up.railway.app';
         }
         return 'http://localhost:8000';

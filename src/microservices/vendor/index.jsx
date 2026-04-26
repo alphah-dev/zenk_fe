@@ -54,23 +54,15 @@ export default function VendorDashboard() {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [statsRes, prodsRes, ordersRes, reqsRes] = await Promise.allSettled([
-        apiClient.get('/vendor/stats'),
-        apiClient.get('/vendor/products'),
-        apiClient.get('/vendor/orders'),
-        apiClient.get('/vendor/requests'),
-      ]);
-
-      if (statsRes.status === 'fulfilled') setStats(statsRes.value);
-      if (prodsRes.status === 'fulfilled') setProducts(prodsRes.value || []);
-      if (ordersRes.status === 'fulfilled') setOrders(ordersRes.value || []);
-      if (reqsRes.status === 'fulfilled') setRequests(reqsRes.value || []);
+      // Fetch everything in one single roundtrip to prevent cold-start bottlenecks
+      const bundle = await apiClient.get('/vendor/dashboard-bundle');
       
-      // Fetch unread notification count
-      try {
-        const notifs = await apiClient.get('/vendor/notifications');
-        setUnreadNotifications(notifs.filter(n => !n.is_read).length);
-      } catch (e) {}
+      setStats(bundle.stats);
+      setProducts(bundle.products || []);
+      setOrders(bundle.orders || []);
+      setRequests(bundle.requests || []);
+      setUnreadNotifications(bundle.stats?.unread_notifications || 0);
+
     } catch (err) {
       console.error('Failed to load vendor data:', err);
     } finally {

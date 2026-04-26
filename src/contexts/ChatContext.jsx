@@ -11,7 +11,8 @@ export const useChat = () => {
 
 const getApiBase = () => {
   if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
-  if (typeof window !== 'undefined' && (window.location.hostname.includes('vercel.app') || window.location.hostname.includes('zenk'))) {
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+  if (hostname.includes('vercel.app') || hostname.includes('zenk') || hostname.includes('railway.app')) {
     return 'https://deployment-production-27bd.up.railway.app';
   }
   return 'http://localhost:8000';

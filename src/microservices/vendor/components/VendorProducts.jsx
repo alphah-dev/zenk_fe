@@ -71,11 +71,12 @@ export default function VendorProducts({ products, loading, onRefresh, showToast
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure? This will deactivate the product.')) return;
+  const handleToggleActive = async (product) => {
+    const action = product.is_active ? 'deactivate' : 'activate';
+    if (!window.confirm(`Are you sure you want to ${action} this product?`)) return;
     try {
-      await apiClient.delete(`/vendor/products/${id}`);
-      showToast('🗑️ Product deactivated');
+      await apiClient.put(`/vendor/products/${product.id}`, { is_active: !product.is_active });
+      showToast(product.is_active ? '🗑️ Product deactivated' : '✅ Product activated');
       onRefresh();
     } catch (err) {
       showToast(`❌ ${err.message}`);
@@ -182,8 +183,12 @@ export default function VendorProducts({ products, loading, onRefresh, showToast
                   <button className="vp-btn vp-btn-outline vp-btn-sm" onClick={() => openEdit(product)}>
                     <PencilSquareIcon style={{ width: 14, height: 14 }} /> Edit
                   </button>
-                  <button className="vp-btn vp-btn-outline vp-btn-sm" style={{ color: '#dc2626' }} onClick={() => handleDelete(product.id)}>
-                    <TrashIcon style={{ width: 14, height: 14 }} />
+                  <button 
+                    className="vp-btn vp-btn-outline vp-btn-sm" 
+                    style={{ color: product.is_active ? '#dc2626' : '#16a34a' }} 
+                    onClick={() => handleToggleActive(product)}
+                  >
+                    {product.is_active ? 'Deactivate' : 'Activate'}
                   </button>
                 </div>
               </div>
