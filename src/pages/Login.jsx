@@ -49,11 +49,15 @@ function Login() {
 
       if (data.access_token) {
         sessionStorage.setItem('zenk_token', data.access_token);
+        localStorage.setItem('access_token', data.access_token);  // for corporate hook
+        localStorage.setItem('chat_token', data.access_token);    // for chat websocket auth
         sessionStorage.setItem('isAdmin', 'false');
         sessionStorage.setItem('zenk_persona', data.persona);
 
         // Dynamic Redirection based on Persona
-        if (data.persona === 'vendor') {
+        if (data.persona === 'corporate') {
+          navigate('/corporate-dashboard');
+        } else if (data.persona === 'vendor') {
           navigate('/dashboard/vendor-portal');
         } else if (data.persona === 'sponsor') {
           navigate('/dashboard/home');
