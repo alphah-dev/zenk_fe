@@ -1,7 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-
+const getApiBase = () => {
+  if (import.meta.env.VITE_API_BASE_URL) return import.meta.env.VITE_API_BASE_URL;
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+  if (hostname.includes('vercel.app') || hostname.includes('zenk') || hostname.includes('railway.app')) {
+    return 'https://deployment-production-27bd.up.railway.app';
+  }
+  return 'http://localhost:8000';
+};
+const API_BASE = getApiBase();
 const getAuthHeaders = () => {
   const token = localStorage.getItem('access_token');
   return { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
