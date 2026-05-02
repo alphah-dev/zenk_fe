@@ -113,7 +113,14 @@ function KiaChatPanel() {
 
 export default function CorporateDashboard() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('portfolio');
+  const [activeTab, setActiveTab] = useState(() => {
+    return sessionStorage.getItem('corp_dashboard_tab') || 'portfolio';
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem('corp_dashboard_tab', activeTab);
+  }, [activeTab]);
+
   const [fy, setFy] = useState('2025-26');
   const { profile, zenqOverview, allocations, circlesPerf, employees, csrAccount, loading, error, refresh, reallocate } = useCorporateData(fy);
 
