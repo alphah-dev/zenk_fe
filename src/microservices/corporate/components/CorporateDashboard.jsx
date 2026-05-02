@@ -8,6 +8,7 @@ import CorpCirclePerf from './CorpCirclePerf';
 import CorpEmployees from './CorpEmployees';
 import CorpCSRAccount from './CorpCSRAccount';
 import CorpCertification from './CorpCertification';
+import CorpKiaStrategy from './CorpKiaStrategy';
 import { ChatProvider } from '../../../contexts/ChatContext';
 import MessageList from '../../../components/chat/MessageList';
 import MessageInput from '../../../components/chat/MessageInput';
@@ -122,7 +123,11 @@ export default function CorporateDashboard() {
   }, [activeTab]);
 
   const [fy, setFy] = useState('2025-26');
-  const { profile, zenqOverview, allocations, circlesPerf, employees, csrAccount, loading, error, refresh, reallocate } = useCorporateData(fy);
+  const { 
+    profile, zenqOverview, allocations, circlesPerf, employees, csrAccount, 
+    strategyBrief, peerBenchmarks, goals,
+    loading, error, refresh, reallocate 
+  } = useCorporateData(fy);
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
@@ -292,16 +297,18 @@ export default function CorporateDashboard() {
           )}
           {!loading && activeTab === 'circles' && <CorpCirclePerf circlesPerf={circlesPerf} reallocate={reallocate} unallocatedBalance={profile?.unallocated || 0} />}
           {!loading && activeTab === 'employees' && <CorpEmployees employees={employees} onNavigate={setActiveTab} />}
-          {!loading && activeTab === 'csr-account' && <CorpCSRAccount csrAccount={csrAccount} />}
+          {!loading && activeTab === 'csr-account' && <CorpCSRAccount csrAccount={csrAccount} onRefresh={() => refresh(fy)} />}
 
           {!loading && activeTab === 'impact' && <CorpCertification profile={profile} />}
           {!loading && activeTab === 'kia' && (
-            <div className="c-coming-soon">
-              <h3>Kia AI Strategy Assistant</h3>
-              <p>
-                Kia will provide personalized recommendations on fund allocation, circle selection, and CSR strategy optimization based on your ZenQ data.
-              </p>
-            </div>
+            <CorpKiaStrategy 
+              profile={profile} 
+              strategyBrief={strategyBrief} 
+              peerBenchmarks={peerBenchmarks} 
+              goals={goals} 
+              circlesPerf={circlesPerf}
+              onRefresh={() => refresh(fy)} 
+            />
           )}
         </div>
 

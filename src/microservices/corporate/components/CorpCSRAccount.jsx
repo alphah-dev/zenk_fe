@@ -4,10 +4,15 @@ import '../csr_styles.css';
 
 const fmt = (n) => `₹${(n || 0).toLocaleString('en-IN')}`;
 
-export default function CorpCSRAccount({ csrAccount }) {
+export default function CorpCSRAccount({ csrAccount, onRefresh }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [showTopUpModal, setShowTopUpModal] = useState(false);
+  const [showDisbursementModal, setShowDisbursementModal] = useState(false);
+  const [newDisbursement, setNewDisbursement] = useState({
+    circle_name: '', amount: '', due_date: '', status: 'scheduled', tranche: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const itemsPerPage = 5;
 
   if (!csrAccount) return <div className="c-skeleton" style={{ height: 400 }} />;
@@ -61,32 +66,82 @@ export default function CorpCSRAccount({ csrAccount }) {
         }
       });
       
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`Failed to download ledger: ${response.status} ${errText}`);
-      }
+      if (!response.ok) throw new Error('Failed to download report');
       
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'ZenQ_Annual_Report_FY2025-26.pdf';
+      a.download = `ZenK_Corporate_Ledger_${new Date().getFullYear()}.pdf`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      console.error('Error downloading ledger:', err);
-      alert('Authentication failed or unable to download ledger.');
+      console.error(err);
+      alert('Could not download ledger. Ensure you are authenticated.');
+    }
+  };
+
+  const handleAddDisbursement = async () => {
+    if (!newDisbursement.circle_name || !newDisbursement.amount || !newDisbursement.due_date) {
+      alert("Please fill all required fields.");
+      return;
+    }
+    try {
+      setIsSubmitting(true);
+      const token = localStorage.getItem('access_token');
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : 'https://deployment-production-27bd.up.railway.app');
+      
+      const payload = { ...newDisbursement, amount: parseInt(newDisbursement.amount) || 0 };
+      const response = await fetch(`${API_BASE}/corporate/csr-account/disbursements`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (response.ok) {
+        setShowDisbursementModal(false);
+        setNewDisbursement({ circle_name: '', amount: '', due_date: '', status: 'scheduled', tranche: '' });
+        if (onRefresh) onRefresh();
+      } else {
+        alert("Failed to add disbursement");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error adding disbursement");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteDisbursement = async (index) => {
+    if (!window.confirm("Are you sure you want to delete this disbursement?")) return;
+    try {
+      const token = localStorage.getItem('access_token');
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : 'https://deployment-production-27bd.up.railway.app');
+      
+      const response = await fetch(`${API_BASE}/corporate/csr-account/disbursements/${index}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        if (onRefresh) onRefresh();
+      } else {
+        alert("Failed to delete disbursement");
+      }
+    } catch (err) {
+      console.error(err);
     }
   };
 
   return (
     <div className="csr-grid">
-      {/* Top Section: Overview (Left) & Actions/Alerts (Right) */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px', marginBottom: '24px' }}>
-        
-        {/* Left Column: Account Overview */}
         <div className="csr-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
             <h2 style={{ margin: '0 0 4px 0', fontSize: '24px', fontWeight: '600', color: '#1a1a1a' }}>Account Overview</h2>
@@ -125,9 +180,7 @@ export default function CorpCSRAccount({ csrAccount }) {
           </div>
         </div>
         
-        {/* Right Column: Actions & Notifications */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          
           <div className="csr-card">
             <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#1a1a1a' }}>Quick Actions</h3>
             <div style={{ display: 'flex', gap: '12px' }}>
@@ -166,13 +219,10 @@ export default function CorpCSRAccount({ csrAccount }) {
               )}
             </div>
           </div>
-
         </div>
       </div>
 
-      {/* Charts Grid */}
       <div className="csr-charts-grid">
-        {/* Donut Chart: Spend by Category */}
         <div className="csr-card">
           <div className="c-card-title">Allocation by Category</div>
           <div style={{ height: '240px', marginTop: '16px' }}>
@@ -205,7 +255,6 @@ export default function CorpCSRAccount({ csrAccount }) {
           </div>
         </div>
 
-        {/* Area Chart: Monthly Burn */}
         <div className="csr-card">
           <div className="c-card-title">Monthly Burn Rate</div>
           <div style={{ height: '240px', marginTop: '16px' }}>
@@ -228,14 +277,30 @@ export default function CorpCSRAccount({ csrAccount }) {
         </div>
       </div>
 
-      {/* Upcoming Disbursements */}
-      {csrAccount.upcoming_disbursements && csrAccount.upcoming_disbursements.length > 0 && (
-        <div className="csr-card">
-          <div className="c-card-title" style={{ marginBottom: '16px' }}>Upcoming Scheduled Disbursements</div>
+      <div className="csr-card">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div className="c-card-title" style={{ margin: 0 }}>Upcoming Scheduled Disbursements</div>
+          <button className="csr-btn-secondary" style={{ padding: '6px 12px', fontSize: '13px' }} onClick={() => setShowDisbursementModal(true)}>
+            + Add Disbursement
+          </button>
+        </div>
+        
+        {(!csrAccount.upcoming_disbursements || csrAccount.upcoming_disbursements.length === 0) ? (
+          <div style={{ padding: '32px', textAlign: 'center', color: '#888', background: '#f8f9fa', borderRadius: '12px' }}>
+            No upcoming disbursements scheduled.
+          </div>
+        ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
             {csrAccount.upcoming_disbursements.map((d, i) => (
-              <div key={i} style={{ background: '#f8f9fa', padding: '16px', borderRadius: '12px', border: '1px solid #e8e8e4' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+              <div key={i} style={{ background: '#f8f9fa', padding: '16px', borderRadius: '12px', border: '1px solid #e8e8e4', position: 'relative' }}>
+                <button 
+                  onClick={() => handleDeleteDisbursement(i)}
+                  style={{ position: 'absolute', top: '12px', right: '12px', background: 'none', border: 'none', color: '#F54A4A', cursor: 'pointer', opacity: 0.6 }}
+                  title="Delete Disbursement"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', paddingRight: '24px' }}>
                   <span style={{ fontWeight: '600', color: '#1a1a1a' }}>{d.circle_name}</span>
                   <span style={{ color: '#F0A500', fontWeight: 'bold' }}>{fmt(d.amount)}</span>
                 </div>
@@ -246,10 +311,9 @@ export default function CorpCSRAccount({ csrAccount }) {
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Ledger Table */}
       <div className="csr-card">
         <div className="csr-table-controls">
           <div className="c-card-title" style={{ margin: 0 }}>Transaction Ledger</div>
@@ -303,7 +367,6 @@ export default function CorpCSRAccount({ csrAccount }) {
           </table>
         </div>
 
-        {/* Pagination */}
         {totalPages > 1 && (
           <div className="csr-pagination">
             <button className="csr-page-btn" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>&lsaquo;</button>
@@ -321,24 +384,83 @@ export default function CorpCSRAccount({ csrAccount }) {
         )}
       </div>
 
-      {/* Top-Up Modal Overlay */}
       {showTopUpModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div className="csr-card" style={{ width: '100%', maxWidth: '400px', padding: '24px' }}>
-            <h3 style={{ margin: '0 0 16px 0', fontSize: '20px', color: '#1a1a1a' }}>Add Funds</h3>
-            <p style={{ color: '#6c757d', fontSize: '14px', marginBottom: '24px' }}>Please specify the amount you wish to transfer to your ZenK Escrow Account.</p>
-            
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#1a1a1a', marginBottom: '8px' }}>Amount (₹)</label>
-              <input type="number" placeholder="e.g. 500000" style={{ width: '100%', padding: '12px', border: '1px solid #e8e8e4', borderRadius: '8px', fontSize: '16px' }} />
+        <div className="c-modal-overlay">
+          <div className="c-modal" style={{ maxWidth: 450 }}>
+            <div className="c-modal-header">
+              <h3>Top-Up Escrow Account</h3>
+              <button onClick={() => setShowTopUpModal(false)}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             </div>
-            
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button className="csr-btn-secondary" style={{ flex: 1 }} onClick={() => setShowTopUpModal(false)}>Cancel</button>
-              <button className="csr-btn-primary" style={{ flex: 1 }} onClick={() => {
-                alert('Transfer initiated! This will open your payment gateway.');
-                setShowTopUpModal(false);
-              }}>Proceed to Pay</button>
+            <div className="c-modal-body" style={{ padding: '24px' }}>
+              <p style={{ color: '#666', fontSize: 14, marginBottom: 24, lineHeight: 1.5 }}>
+                Top-ups to the ZenK CSR Escrow are facilitated via secure RTGS/NEFT transfers.
+              </p>
+              <div style={{ background: '#f8f9fa', padding: '16px', borderRadius: '8px', border: '1px solid #eee', marginBottom: 24 }}>
+                <div style={{ fontSize: 13, color: '#888', marginBottom: 4 }}>Virtual Account Number</div>
+                <div style={{ fontSize: 18, fontWeight: 700, color: '#1a1a1a', letterSpacing: '1px' }}>{csrAccount.account_number}</div>
+                <div style={{ fontSize: 13, color: '#888', marginTop: 12, marginBottom: 4 }}>IFSC Code</div>
+                <div style={{ fontSize: 16, fontWeight: 600, color: '#1a1a1a' }}>HDFC0000ZNK</div>
+              </div>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button className="csr-btn-secondary" style={{ flex: 1 }} onClick={() => setShowTopUpModal(false)}>Cancel</button>
+                <button className="csr-btn-primary" style={{ flex: 1 }} onClick={() => {
+                  alert("Transfer details copied. Proceed via your corporate banking portal.");
+                  setShowTopUpModal(false);
+                }}>Copy Details</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDisbursementModal && (
+        <div className="c-modal-overlay">
+          <div className="c-modal" style={{ maxWidth: 500 }}>
+            <div className="c-modal-header">
+              <h3>Add Disbursement</h3>
+              <button onClick={() => setShowDisbursementModal(false)}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+            <div className="c-modal-body" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Circle Name</label>
+                <input type="text" className="csr-search-input" style={{ width: '100%', marginBottom: 0 }}
+                  value={newDisbursement.circle_name} onChange={e => setNewDisbursement({...newDisbursement, circle_name: e.target.value})} placeholder="e.g. Ashoka Rising Circle" />
+              </div>
+              <div style={{ display: 'flex', gap: '16px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Amount (₹)</label>
+                  <input type="number" className="csr-search-input" style={{ width: '100%', marginBottom: 0 }}
+                    value={newDisbursement.amount} onChange={e => setNewDisbursement({...newDisbursement, amount: e.target.value})} placeholder="20000" />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Due Date</label>
+                  <input type="text" className="csr-search-input" style={{ width: '100%', marginBottom: 0 }}
+                    value={newDisbursement.due_date} onChange={e => setNewDisbursement({...newDisbursement, due_date: e.target.value})} placeholder="e.g. Apr 1, 2026" />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '16px' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Tranche</label>
+                  <input type="text" className="csr-search-input" style={{ width: '100%', marginBottom: 0 }}
+                    value={newDisbursement.tranche} onChange={e => setNewDisbursement({...newDisbursement, tranche: e.target.value})} placeholder="e.g. Q1 FY26-27" />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, marginBottom: 4 }}>Status</label>
+                  <select className="csr-search-input" style={{ width: '100%', marginBottom: 0 }}
+                    value={newDisbursement.status} onChange={e => setNewDisbursement({...newDisbursement, status: e.target.value})}>
+                    <option value="scheduled">Scheduled</option>
+                    <option value="pending_approval">Pending Approval</option>
+                  </select>
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
+                <button className="csr-btn-secondary" style={{ flex: 1 }} onClick={() => setShowDisbursementModal(false)}>Cancel</button>
+                <button className="csr-btn-primary" style={{ flex: 1 }} onClick={handleAddDisbursement} disabled={isSubmitting}>
+                  {isSubmitting ? 'Saving...' : 'Save Disbursement'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
