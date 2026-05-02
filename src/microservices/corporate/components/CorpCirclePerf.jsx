@@ -155,13 +155,13 @@ export default function CorpCirclePerf({ circlesPerf, reallocate, unallocatedBal
       {/* Platform Pool Section */}
       <div className="c-platform-pool-card">
         <div className="c-pool-header">
-          <h3>ZenK Platform pool — your {circlesPerf.platform_pool_pct}% allocation</h3>
-          <p>₹{circlesPerf.platform_pool_amount.toLocaleString()} ({circlesPerf.platform_pool_pct}% of your total) is pooled with all corporate partners and distributed by AI across all {circlesPerf.total_circles_benefitting} circles. This earns the national average ZenQ of <strong>{circlesPerf.national_avg_zenq}</strong>.</p>
+          <h3>ZenK Platform pool — your {circlesPerf.platform_pool_pct || 10}% allocation</h3>
+          <p>₹{(circlesPerf.platform_pool_amount || 0).toLocaleString()} ({circlesPerf.platform_pool_pct || 10}% of your total) is pooled with all corporate partners and distributed by AI across all {circlesPerf.total_circles_benefitting || 0} circles. This earns the national average ZenQ of <strong>{circlesPerf.national_avg_zenq || 76.2}</strong>.</p>
         </div>
         <div className="c-pool-metrics">
           <div className="c-pool-kpi">
             <label>YOUR ZENK POOL CONTRIBUTION</label>
-            <div className="c-val">₹{circlesPerf.platform_pool_amount.toLocaleString()}</div>
+            <div className="c-val">₹{(circlesPerf.platform_pool_amount || 0).toLocaleString()}</div>
           </div>
           <div className="c-pool-kpi">
             <label>NATIONAL AVG ZENQ</label>

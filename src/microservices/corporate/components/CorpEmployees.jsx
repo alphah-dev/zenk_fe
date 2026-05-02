@@ -164,7 +164,7 @@ function EmpCircleCard({ circle, onViewCircle }) {
     }}>
       <div style={{ fontSize: 14, fontWeight: 800, color: '#1e293b', marginBottom: 4 }}>{circle.name}</div>
       <div style={{ fontSize: 11.5, color: '#64748b', marginBottom: 12 }}>
-        {circle.employees} TCS employees &nbsp;·&nbsp; Company match ₹{circle.company_match.toLocaleString('en-IN')}
+        {circle.employees} TCS employees &nbsp;·&nbsp; Company match ₹{(circle.company_match || 0).toLocaleString('en-IN')}
       </div>
       <div style={{ display: 'flex', gap: 20 }}>
         <div>
@@ -177,7 +177,7 @@ function EmpCircleCard({ circle, onViewCircle }) {
         </div>
         <div>
           <div style={{ fontSize: 10, fontWeight: 700, color: '#888', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Fund</div>
-          <div style={{ fontSize: 20, fontWeight: 900, color: '#1e293b' }}>₹{circle.fund.toLocaleString('en-IN')}</div>
+          <div style={{ fontSize: 20, fontWeight: 900, color: '#1e293b' }}>₹{(circle.fund || 0).toLocaleString('en-IN')}</div>
         </div>
       </div>
       <button
