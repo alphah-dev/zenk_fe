@@ -130,28 +130,6 @@ export default function CorporateDashboard() {
     navigate('/login');
   };
 
-  if (error) {
-    return (
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        height: '100vh', background: '#f4f4f0', flexDirection: 'column', gap: 16,
-        fontFamily: 'Inter, sans-serif',
-      }}>
-        <div style={{ fontSize: 36, color: '#F0A500' }}>
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
-          </svg>
-        </div>
-        <div style={{ fontSize: 17, fontWeight: 700, color: '#1a1a1a' }}>Session expired or unauthorized</div>
-        <div style={{ fontSize: 13, color: '#888' }}>{error}</div>
-        <button onClick={() => navigate('/login')} style={{
-          background: '#4A72F5', color: '#fff', border: 'none', padding: '10px 24px',
-          borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: 14,
-        }}>Back to Login</button>
-      </div>
-    );
-  }
-
   const company = profile?.company_name || 'TCS Foundation';
   const fullName = profile?.company_name || 'Tata Consultancy Services Foundation';
   const initials = profile?.company_initials || 'TCS';
@@ -177,6 +155,28 @@ export default function CorporateDashboard() {
 
   const logoUrl = getCompanyLogoUrl(fullName);
   const currentTheme = useBrandColor(logoUrl);
+
+  if (error) {
+    return (
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        height: '100vh', background: '#f4f4f0', flexDirection: 'column', gap: 16,
+        fontFamily: 'Inter, sans-serif',
+      }}>
+        <div style={{ fontSize: 36, color: '#F0A500' }}>
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+        </div>
+        <div style={{ fontSize: 17, fontWeight: 700, color: '#1a1a1a' }}>Session expired or unauthorized</div>
+        <div style={{ fontSize: 13, color: '#888' }}>{error}</div>
+        <button onClick={() => navigate('/login')} style={{
+          background: '#4A72F5', color: '#fff', border: 'none', padding: '10px 24px',
+          borderRadius: 8, fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif', fontSize: 14,
+        }}>Back to Login</button>
+      </div>
+    );
+  }
 
   const bannerStyle = {
     '--b-start': currentTheme.start,

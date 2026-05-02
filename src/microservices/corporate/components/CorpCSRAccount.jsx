@@ -7,6 +7,7 @@ const fmt = (n) => `₹${(n || 0).toLocaleString('en-IN')}`;
 export default function CorpCSRAccount({ csrAccount }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [showTopUpModal, setShowTopUpModal] = useState(false);
   const itemsPerPage = 5;
 
   if (!csrAccount) return <div className="c-skeleton" style={{ height: 400 }} />;
@@ -50,47 +51,73 @@ export default function CorpCSRAccount({ csrAccount }) {
     return null;
   };
 
+  const handleDownloadLedger = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : 'https://deployment-production-27bd.up.railway.app');
+      const response = await fetch(`${API_BASE}/corporate/impact/annual-report`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(`Failed to download ledger: ${response.status} ${errText}`);
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ZenQ_Annual_Report_FY2025-26.pdf';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Error downloading ledger:', err);
+      alert('Authentication failed or unable to download ledger.');
+    }
+  };
+
   return (
     <div className="csr-grid">
-      {/* Alerts */}
-      {csrAccount.alerts && csrAccount.alerts.map((alert, i) => (
-        <div className="csr-alert-banner" key={i}>
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          {alert}
-        </div>
-      ))}
-
-      {/* Top Header & Mandate */}
-      <div className="csr-card csr-grid-top">
-        <div>
-          <h2 style={{ margin: '0 0 4px 0', fontSize: '24px', fontWeight: '600' }}>Account Overview</h2>
-          <div style={{ color: '#aaa', fontSize: '14px', marginBottom: '24px' }}>
-            Account #: {csrAccount.account_number} • {csrAccount.fy_label}
-            <span style={{ marginLeft: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px', color: csrAccount.compliance_status === 'on_track' ? '#0CBEAA' : '#F0A500' }}>
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              Compliance {csrAccount.compliance_status.replace('_', ' ')}
-            </span>
-          </div>
-          
-          <div className="csr-stat-row">
-            <div className="csr-stat-box">
-              <div className="csr-stat-label">Total Received</div>
-              <div className="csr-stat-value">{fmt(csrAccount.total_received)}</div>
-            </div>
-            <div className="csr-stat-box">
-              <div className="csr-stat-label">Total Deployed</div>
-              <div className="csr-stat-value">{fmt(csrAccount.total_deployed)}</div>
-            </div>
-            <div className="csr-stat-box">
-              <div className="csr-stat-label">Current Balance</div>
-              <div className="csr-stat-value" style={{ color: '#F0A500' }}>{fmt(csrAccount.balance)}</div>
-            </div>
-          </div>
-
+      {/* Top Section: Overview (Left) & Actions/Alerts (Right) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px', marginBottom: '24px' }}>
+        
+        {/* Left Column: Account Overview */}
+        <div className="csr-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#aaa' }}>
-              <span>Mandate Progress</span>
-              <span>{csrAccount.mandate_used_pct}% deployed of {fmt(csrAccount.mandate_amount)}</span>
+            <h2 style={{ margin: '0 0 4px 0', fontSize: '24px', fontWeight: '600', color: '#1a1a1a' }}>Account Overview</h2>
+            <div style={{ color: '#6c757d', fontSize: '14px', marginBottom: '24px' }}>
+              Account #: {csrAccount.account_number} • {csrAccount.fy_label}
+              <span style={{ marginLeft: '12px', display: 'inline-flex', alignItems: 'center', gap: '4px', color: csrAccount.compliance_status === 'on_track' ? '#0CBEAA' : '#F0A500' }}>
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Compliance {csrAccount.compliance_status.replace('_', ' ')}
+              </span>
+            </div>
+            
+            <div className="csr-stat-row">
+              <div className="csr-stat-box">
+                <div className="csr-stat-label">Total Received</div>
+                <div className="csr-stat-value">{fmt(csrAccount.total_received)}</div>
+              </div>
+              <div className="csr-stat-box">
+                <div className="csr-stat-label">Total Deployed</div>
+                <div className="csr-stat-value">{fmt(csrAccount.total_deployed)}</div>
+              </div>
+              <div className="csr-stat-box">
+                <div className="csr-stat-label">Current Balance</div>
+                <div className="csr-stat-value" style={{ color: '#F0A500' }}>{fmt(csrAccount.balance)}</div>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: '32px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#6c757d', marginBottom: '8px' }}>
+              <span style={{ fontWeight: '500' }}>Mandate Progress</span>
+              <span style={{ fontWeight: '600' }}>{csrAccount.mandate_used_pct}% deployed of {fmt(csrAccount.mandate_amount)}</span>
             </div>
             <div className="csr-mandate-track">
               <div className="csr-mandate-fill" style={{ width: `${csrAccount.mandate_used_pct}%` }} />
@@ -98,13 +125,48 @@ export default function CorpCSRAccount({ csrAccount }) {
           </div>
         </div>
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', justifyContent: 'center' }}>
-          <button className="csr-btn-primary" onClick={() => alert('Top-up Modal trigger')}>
-            + Add Funds / Top-up
-          </button>
-          <button className="csr-btn-secondary" onClick={() => window.open('/corporate/pdf-report?fy=2025-26', '_blank')}>
-            Download Ledger (PDF)
-          </button>
+        {/* Right Column: Actions & Notifications */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          
+          <div className="csr-card">
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#1a1a1a' }}>Quick Actions</h3>
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button className="csr-btn-primary" style={{ flex: 1 }} onClick={() => setShowTopUpModal(true)}>
+                + Add Funds / Top-up
+              </button>
+              <button className="csr-btn-secondary" style={{ flex: 1 }} onClick={handleDownloadLedger}>
+                Download Ledger (PDF)
+              </button>
+            </div>
+          </div>
+
+          <div className="csr-card" style={{ flex: 1 }}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#1a1a1a' }}>Notifications</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {csrAccount.alerts && csrAccount.alerts.map((a, i) => {
+                const isObj = typeof a === 'object';
+                const type = isObj ? a.type : 'info';
+                const message = isObj ? a.message : a;
+                return (
+                  <div key={i} style={{ 
+                    padding: '12px 16px', 
+                    background: type === 'info' ? '#f0f4ff' : '#fff8e5', 
+                    color: '#1a1a1a', 
+                    borderRadius: '8px', 
+                    fontSize: '13px', 
+                    lineHeight: '1.4',
+                    borderLeft: `4px solid ${type === 'info' ? '#4A72F5' : '#F0A500'}` 
+                  }}>
+                    {message}
+                  </div>
+                );
+              })}
+              {(!csrAccount.alerts || csrAccount.alerts.length === 0) && (
+                <div style={{ color: '#6c757d', fontSize: '13px' }}>No new notifications.</div>
+              )}
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -123,6 +185,7 @@ export default function CorpCSRAccount({ csrAccount }) {
                   paddingAngle={5}
                   dataKey="amount"
                   nameKey="category"
+                  stroke="none"
                 >
                   {csrAccount.spend_by_category.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -134,7 +197,7 @@ export default function CorpCSRAccount({ csrAccount }) {
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', justifyContent: 'center', marginTop: '16px' }}>
             {csrAccount.spend_by_category.map((cat, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#aaa' }}>
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#6c757d' }}>
                 <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: cat.color }} />
                 {cat.category}
               </div>
@@ -154,9 +217,9 @@ export default function CorpCSRAccount({ csrAccount }) {
                     <stop offset="95%" stopColor="#F54A4A" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="month" stroke="rgba(255,255,255,0.2)" fontSize={12} tickMargin={10} />
-                <YAxis stroke="rgba(255,255,255,0.2)" fontSize={12} tickFormatter={(val) => `₹${val/1000}k`} />
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
+                <XAxis dataKey="month" stroke="#a0a0a0" fontSize={12} tickMargin={10} />
+                <YAxis stroke="#a0a0a0" fontSize={12} tickFormatter={(val) => `₹${val/1000}k`} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
                 <RechartsTooltip content={<CustomAreaTooltip />} />
                 <Area type="monotone" dataKey="amount" stroke="#F54A4A" strokeWidth={2} fillOpacity={1} fill="url(#colorBurn)" />
               </AreaChart>
@@ -171,12 +234,12 @@ export default function CorpCSRAccount({ csrAccount }) {
           <div className="c-card-title" style={{ marginBottom: '16px' }}>Upcoming Scheduled Disbursements</div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
             {csrAccount.upcoming_disbursements.map((d, i) => (
-              <div key={i} style={{ background: 'rgba(0,0,0,0.2)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+              <div key={i} style={{ background: '#f8f9fa', padding: '16px', borderRadius: '12px', border: '1px solid #e8e8e4' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <span style={{ fontWeight: '600', color: '#fff' }}>{d.circle_name}</span>
+                  <span style={{ fontWeight: '600', color: '#1a1a1a' }}>{d.circle_name}</span>
                   <span style={{ color: '#F0A500', fontWeight: 'bold' }}>{fmt(d.amount)}</span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#aaa' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#6c757d' }}>
                   <span>{d.tranche} • Due: {d.due_date}</span>
                   <span style={{ color: d.status === 'scheduled' ? '#4A72F5' : '#888' }}>{d.status.replace('_', ' ')}</span>
                 </div>
@@ -215,10 +278,10 @@ export default function CorpCSRAccount({ csrAccount }) {
               {currentTxns.map((t, i) => (
                 <tr key={i}>
                   <td style={{ whiteSpace: 'nowrap' }}>{t.date}</td>
-                  <td style={{ color: '#aaa', fontSize: '13px' }}>{t.reference || '—'}</td>
+                  <td style={{ color: '#6c757d', fontSize: '13px' }}>{t.reference || '—'}</td>
                   <td>
-                    <div style={{ color: '#fff', fontWeight: '500' }}>{t.description}</div>
-                    {t.circle && <div style={{ fontSize: '12px', color: '#888', marginTop: '4px' }}>Circle: {t.circle}</div>}
+                    <div style={{ color: '#1a1a1a', fontWeight: '500' }}>{t.description}</div>
+                    {t.circle && <div style={{ fontSize: '12px', color: '#6c757d', marginTop: '4px' }}>Circle: {t.circle}</div>}
                   </td>
                   <td>{t.category}</td>
                   <td>
@@ -226,14 +289,14 @@ export default function CorpCSRAccount({ csrAccount }) {
                       {t.type === 'credit' ? '+' : t.type === 'debit' ? '−' : '+'}{fmt(t.amount)}
                     </span>
                   </td>
-                  <td style={{ fontWeight: 'bold', color: '#e8e8e4' }}>
+                  <td style={{ fontWeight: 'bold', color: '#333' }}>
                     {t.running_balance !== undefined ? fmt(t.running_balance) : '—'}
                   </td>
                 </tr>
               ))}
               {currentTxns.length === 0 && (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: 'center', padding: '32px', color: '#aaa' }}>No transactions found for "{searchTerm}"</td>
+                  <td colSpan="6" style={{ textAlign: 'center', padding: '32px', color: '#6c757d' }}>No transactions found for "{searchTerm}"</td>
                 </tr>
               )}
             </tbody>
@@ -257,6 +320,29 @@ export default function CorpCSRAccount({ csrAccount }) {
           </div>
         )}
       </div>
+
+      {/* Top-Up Modal Overlay */}
+      {showTopUpModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div className="csr-card" style={{ width: '100%', maxWidth: '400px', padding: '24px' }}>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '20px', color: '#1a1a1a' }}>Add Funds</h3>
+            <p style={{ color: '#6c757d', fontSize: '14px', marginBottom: '24px' }}>Please specify the amount you wish to transfer to your ZenK Escrow Account.</p>
+            
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#1a1a1a', marginBottom: '8px' }}>Amount (₹)</label>
+              <input type="number" placeholder="e.g. 500000" style={{ width: '100%', padding: '12px', border: '1px solid #e8e8e4', borderRadius: '8px', fontSize: '16px' }} />
+            </div>
+            
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button className="csr-btn-secondary" style={{ flex: 1 }} onClick={() => setShowTopUpModal(false)}>Cancel</button>
+              <button className="csr-btn-primary" style={{ flex: 1 }} onClick={() => {
+                alert('Transfer initiated! This will open your payment gateway.');
+                setShowTopUpModal(false);
+              }}>Proceed to Pay</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
