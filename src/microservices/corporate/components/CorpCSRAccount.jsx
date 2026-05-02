@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
 import '../csr_styles.css';
+import { BASE_URL } from '../../../utils/apiClient';
 
 const fmt = (n) => `₹${(n || 0).toLocaleString('en-IN')}`;
 
@@ -59,8 +60,7 @@ export default function CorpCSRAccount({ csrAccount, onRefresh }) {
   const handleDownloadLedger = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || (window.location.hostname === 'localhost' ? 'http://localhost:8000' : 'https://deployment-production-27bd.up.railway.app');
-      const response = await fetch(`${API_BASE}/corporate/impact/annual-report`, {
+      const response = await fetch(`${BASE_URL}/corporate/impact/annual-report`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

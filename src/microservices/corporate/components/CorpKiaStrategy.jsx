@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import CircleChatPanel from './CircleChatPanel';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+import { BASE_URL } from '../../../utils/apiClient';
 
 /* ── tiny helper ──────────────────────────────────────────────────────────── */
 async function kiaChat(message, isScenario = false) {
   const token = localStorage.getItem('access_token');
-  const res = await fetch(`${API_BASE}/corporate/kia-chat`, {
+  const res = await fetch(`${BASE_URL}/corporate/kia-chat`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ export default function CorpKiaStrategy({
     try {
       setIsRegenerating(true);
       const token = localStorage.getItem('access_token');
-      await fetch(`${API_BASE}/corporate/kia-strategy-brief?force_refresh=true`, {
+      await fetch(`${BASE_URL}/corporate/kia-strategy-brief?force_refresh=true`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       await onRefresh();

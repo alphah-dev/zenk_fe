@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+import { BASE_URL } from '../../../utils/apiClient';
 
 // ── Tier Definitions ─────────────────────────────────────────────────────────
 const TIERS = [
@@ -67,7 +67,7 @@ const TIERS = [
 async function downloadFile(endpoint, filename) {
   const token = localStorage.getItem('access_token') || sessionStorage.getItem('access_token');
   try {
-    const res = await fetch(`${API}${endpoint}`, {
+    const res = await fetch(`${BASE_URL}${endpoint}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) throw new Error(`Server error ${res.status}`);

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ZenQGauge, ZenQTrendChart, AllocationDonut } from './CorpCharts';
+import { BASE_URL } from '../../../utils/apiClient';
 
 const fmt = n => `₹${(n || 0).toLocaleString('en-IN')}`;
 
@@ -16,8 +17,7 @@ export default function CorpPortfolio({ profile, zenqOverview, allocations, onRe
     setKiaRecText('');
     try {
       const token = localStorage.getItem('access_token');
-      const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-      const res = await fetch(`${API_BASE}/corporate/kia-recommendation`, {
+      const res = await fetch(`${BASE_URL}/corporate/kia-recommendation`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Failed to fetch recommendation');
