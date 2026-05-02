@@ -7,7 +7,7 @@ export default function CorpPortfolio({ profile, zenqOverview, allocations, onRe
   const [allocInputs, setAllocInputs] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
-  
+
   const [kiaRecState, setKiaRecState] = useState('idle');
   const [kiaRecText, setKiaRecText] = useState('');
 
@@ -74,7 +74,7 @@ export default function CorpPortfolio({ profile, zenqOverview, allocations, onRe
           </div>
           {/* Tier Badge */}
           <div style={{ textAlign: 'center', padding: '12px 24px', minWidth: 120 }}>
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="#F0A500"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="#F0A500"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
             <div style={{ fontSize: 15, fontWeight: 800, color: '#1a1a1a', marginTop: 4 }}>Gold Tier</div>
             <div style={{ fontSize: 11, color: '#888' }}>{zenqOverview.points_to_next} pts to Platinum</div>
           </div>
