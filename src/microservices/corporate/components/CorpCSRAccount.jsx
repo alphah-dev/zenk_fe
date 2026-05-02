@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
-import './csr_styles.css';
+import '../csr_styles.css';
 
 const fmt = (n) => `₹${(n || 0).toLocaleString('en-IN')}`;
 
