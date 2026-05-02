@@ -51,16 +51,26 @@ export function ZenQGauge({ score = 78.4, size = 140 }) {
 /* ── ZenQ Trend Chart ───────────────────────────────────────────────────── */
 export function ZenQTrendChart({ data = [] }) {
   return (
-    <ResponsiveContainer width="100%" height={240}>
-      <ComposedChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -22 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0ee" vertical={false} />
-        <XAxis dataKey="month" tick={{ fill: '#b0b0b0', fontSize: 11 }} axisLine={false} tickLine={false} />
-        <YAxis domain={[0, 100]} tick={{ fill: '#b0b0b0', fontSize: 11 }} axisLine={false} tickLine={false} />
-        <Tooltip content={<CTooltip />} />
-        <Bar dataKey="corporate_score" name="Corp ZenQ" fill="#4A72F5" radius={[4,4,0,0]} maxBarSize={32}
-          label={{ position: 'top', fontSize: 10, fill: '#888', formatter: v => v }} />
+    <ResponsiveContainer width="100%" height={260}>
+      <ComposedChart data={data} margin={{ top: 16, right: 8, bottom: 0, left: -22 }}>
+        <defs>
+          <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#4A72F5" stopOpacity={1} />
+            <stop offset="100%" stopColor="#4A72F5" stopOpacity={0.6} />
+          </linearGradient>
+          <filter id="barShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#4A72F5" floodOpacity="0.2" />
+          </filter>
+        </defs>
+        <CartesianGrid strokeDasharray="4 4" stroke="#eaeaec" vertical={false} />
+        <XAxis dataKey="month" tick={{ fill: '#888', fontSize: 11, fontWeight: 500 }} axisLine={false} tickLine={false} dy={8} />
+        <YAxis domain={[0, 100]} tick={{ fill: '#888', fontSize: 11, fontWeight: 500 }} axisLine={false} tickLine={false} />
+        <Tooltip content={<CTooltip />} cursor={{ fill: '#f8f9fa' }} />
+        <Bar dataKey="corporate_score" name="Corp ZenQ" fill="url(#barGrad)" radius={[6, 6, 0, 0]} maxBarSize={36}
+          label={{ position: 'top', fontSize: 11, fill: '#666', fontWeight: 600, formatter: v => v, dy: -6 }}
+          filter="url(#barShadow)" />
         <Line dataKey="national_avg" name="National Avg" type="monotone" stroke="#F0A500"
-          strokeWidth={1.5} strokeDasharray="5 4" dot={false} />
+          strokeWidth={2} strokeDasharray="6 4" dot={false} activeDot={{ r: 6, fill: '#F0A500', stroke: '#fff', strokeWidth: 2 }} />
       </ComposedChart>
     </ResponsiveContainer>
   );
@@ -70,21 +80,26 @@ export function ZenQTrendChart({ data = [] }) {
 export function AllocationDonut({ circles = [] }) {
   const data = circles.map(c => ({ name: c.circle_name, value: c.allocation_pct, color: c.color }));
   return (
-    <div style={{ position: 'relative' }}>
-      <ResponsiveContainer width="100%" height={200}>
+    <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <ResponsiveContainer width={220} height={220}>
         <PieChart>
-          <Pie data={data} cx="50%" cy="50%" innerRadius={55} outerRadius={80}
-            paddingAngle={2} dataKey="value" strokeWidth={0}>
+          <defs>
+            <filter id="pieShadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="#000" floodOpacity="0.08" />
+            </filter>
+          </defs>
+          <Pie data={data} cx="50%" cy="50%" innerRadius={65} outerRadius={90}
+            paddingAngle={4} dataKey="value" stroke="none" filter="url(#pieShadow)">
             {data.map((d, i) => <Cell key={i} fill={d.color} />)}
           </Pie>
           <Tooltip formatter={(v, n) => [`${v}%`, n]} contentStyle={{
-            background: '#fff', border: '1px solid #e8e8e4', borderRadius: 8, fontSize: 12
+            background: '#fff', border: '1px solid #e8e8e4', borderRadius: 8, fontSize: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.12)'
           }} />
         </PieChart>
       </ResponsiveContainer>
-      <div style={{ textAlign: 'center', marginTop: -10 }}>
-        <div style={{ fontSize: 17, fontWeight: 800, color: '#F0A500' }}>₹1,00,000</div>
-        <div style={{ fontSize: 10, color: '#b0b0b0', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Total CSR</div>
+      <div style={{ position: 'absolute', textAlign: 'center', pointerEvents: 'none' }}>
+        <div style={{ fontSize: 18, fontWeight: 900, color: '#1a1a1a', letterSpacing: '-0.02em' }}>₹1,00,000</div>
+        <div style={{ fontSize: 10, color: '#888', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 600, marginTop: 2 }}>Total CSR</div>
       </div>
     </div>
   );

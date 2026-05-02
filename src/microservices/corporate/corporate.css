@@ -20,10 +20,10 @@
   --c-text-2: #444444;
   --c-text-muted: #888888;
   --c-text-dim: #b0b0b0;
-  --c-shadow: 0 1px 4px rgba(0, 0, 0, 0.08), 0 4px 16px rgba(0, 0, 0, 0.05);
-  --c-shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.12), 0 8px 32px rgba(0, 0, 0, 0.06);
-  --c-radius: 12px;
-  --c-radius-sm: 8px;
+  --c-shadow: 0 4px 20px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
+  --c-shadow-hover: 0 12px 32px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.04);
+  --c-radius: 16px;
+  --c-radius-sm: 10px;
 }
 
 * {
@@ -371,25 +371,26 @@
 
 /* ── Cards ────────────────────────────────────────────────────────────────── */
 .c-card {
-  background: var(--c-surface);
-  border: 1px solid var(--c-border);
+  background: linear-gradient(180deg, #ffffff 0%, #fdfdfd 100%);
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: var(--c-radius);
-  padding: 24px;
+  padding: 32px;
   box-shadow: var(--c-shadow);
-  transition: box-shadow 0.2s;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .c-card:hover {
+  transform: translateY(-2px);
   box-shadow: var(--c-shadow-hover);
 }
 
 .c-card-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--c-text-muted);
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 16px;
+  letter-spacing: 0.08em;
+  margin-bottom: 24px;
 }
 
 /* ── ZenQ Section ─────────────────────────────────────────────────────────── */
